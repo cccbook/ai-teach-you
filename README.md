@@ -8,7 +8,7 @@
 
 ## Books
 
-| Folder | Title | Programming Language |
+| Link | Title | Programming Language |
 |----------|-------|--------------------|
 | [sh](sh/README.md) | Learn to Write Shell Scripts the AI Way - Without Any Editor | Shell Script |
 | [se](se/README.md) | Let AI teach you Software Engineering | Python |
