@@ -41,7 +41,7 @@ module tb_pipeline;
             cycle = cycle + 1;
             $display("cycle=%d PC=%h stall=%b if_flush=%b branch_taken=%b",
                      cycle, uut.pc_current, uut.stall, uut.if_flush, uut.branch_taken);
-            if (cycle >= 200) begin
+            if (cycle >= 100) begin
                 $display("=== Pipeline Final Register State ===");
                 $display("x0  = %d (%h)", uut.debug_reg0,  uut.debug_reg0);
                 $display("x1  = %d (%h)", uut.debug_reg1,  uut.debug_reg1);
