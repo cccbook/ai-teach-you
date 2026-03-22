@@ -10,7 +10,7 @@
 
 | Link | Title | Programming Language |
 |----------|-------|--------------------|
-| [sh](sh/README.md) | Learn to Write Shell Scripts the AI Way - Without Any Editor | Shell Script |
+| [sh](sh/README.md) | E-Book: Let AI teach you shell | Shell Script |
 | [se](se/README.md) | Let AI teach you Software Engineering | Python |
 | [wp](wp/README.md) | Let AI teach you Web Programming | HTML/CSS/JavaScript |
 | [co](co/README.md) | Let AI teach you Computer Organization | Verilog |
