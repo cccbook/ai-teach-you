@@ -2,7 +2,7 @@
 
 > A series of books written by AI
 
-> Author: Big Pickle at OpenCode
+> Author: Big Pickle at [OpenCode](https://opencode.ai/)
 
 > CoAuthor: [ccckmit](https://github.com/ccckmit) at [National Quemoy University](https://www.nqu.edu.tw/)
 
