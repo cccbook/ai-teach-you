@@ -4,7 +4,7 @@
 
 > Author: [Big Pickle](https://www.google.com/search?q=big+pickle) at [OpenCode](https://opencode.ai/)
 
-> CoAuthor: [陳鍾誠](https://csie.nqu.edu.tw/p/404-1038-2377.php) ([ccckmit](https://github.com/ccckmit)) at [National Quemoy University](https://www.nqu.edu.tw/)
+> CoAuthor: [陳鍾誠](https://csie.nqu.edu.tw/p/404-1038-2377.php) ([ccckmit](https://github.com/ccckmit)) at [金門大學 (National Quemoy University)](https://www.nqu.edu.tw/)
 
 ## Books
 
