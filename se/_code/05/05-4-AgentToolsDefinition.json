@@ -1,0 +1,41 @@
+{
+  "tools": [
+    {
+      "name": "read_file",
+      "description": "讀取檔案內容",
+      "parameters": {
+        "path": "string"
+      }
+    },
+    {
+      "name": "write_file",
+      "description": "寫入檔案",
+      "parameters": {
+        "path": "string",
+        "content": "string"
+      }
+    },
+    {
+      "name": "run_command",
+      "description": "執行命令",
+      "parameters": {
+        "command": "string",
+        "timeout": "number"
+      }
+    },
+    {
+      "name": "search",
+      "description": "搜尋檔案",
+      "parameters": {
+        "pattern": "string"
+      }
+    },
+    {
+      "name": "browser_open",
+      "description": "開啟瀏覽器",
+      "parameters": {
+        "url": "string"
+      }
+    }
+  ]
+}

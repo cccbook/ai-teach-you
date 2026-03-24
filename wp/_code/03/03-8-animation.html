@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>CSS 動畫範例</title>
+    <style>
+        .box {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            margin: 20px;
+        }
+        
+        @keyframes moveRight {
+            from { transform: translateX(0); }
+            to { transform: translateX(200px); }
+        }
+        
+        @keyframes changeColor {
+            0% { background-color: #4CAF50; }
+            50% { background-color: #FF5722; }
+            100% { background-color: #4CAF50; }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-50px); }
+        }
+        
+        .animate-move {
+            animation: moveRight 2s ease-in-out infinite;
+        }
+        
+        .animate-color {
+            animation: changeColor 3s ease infinite;
+        }
+        
+        .animate-spin {
+            animation: spin 2s linear infinite;
+        }
+        
+        .animate-bounce {
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        .animation-fill {
+            animation: moveRight 2s forwards;
+        }
+        
+        .animation-delay {
+            animation: moveRight 2s 1s;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS 動畫範例</h1>
+    
+    <div class="box animate-move">移動動畫</div>
+    <div class="box animate-color">顏色動畫</div>
+    <div class="box animate-spin">旋轉動畫</div>
+    <div class="box animate-bounce">彈跳動畫</div>
+    <div class="box animation-fill">動畫結束停在結尾</div>
+    <div class="box animation-delay">延遲 1 秒</div>
+</body>
+</html>

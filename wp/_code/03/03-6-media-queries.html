@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>媒體查詢範例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .box {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        
+        /* 預設樣式 - 行動裝置優先 */
+        .box {
+            width: 100%;
+        }
+        
+        /* 平板裝置 (768px 以上) */
+        @media (min-width: 768px) {
+            .box {
+                width: 45%;
+                display: inline-block;
+            }
+        }
+        
+        /* 桌面裝置 (1024px 以上) */
+        @media (min-width: 1024px) {
+            .box {
+                width: 30%;
+            }
+            
+            body {
+                background-color: #f5f5f5;
+            }
+        }
+        
+        /* 橫向模式 */
+        @media (orientation: landscape) {
+            .box {
+                border: 3px solid orange;
+            }
+        }
+        
+        /* 印表機樣式 */
+        @media print {
+            .box {
+                background-color: white;
+                color: black;
+                border: 1px solid black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>媒體查詢範例</h1>
+    <p>調整瀏覽器視窗大小查看變化</p>
+    
+    <div class="box">Box 1</div>
+    <div class="box">Box 2</div>
+    <div class="box">Box 3</div>
+</body>
+</html>

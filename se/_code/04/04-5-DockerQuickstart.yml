@@ -1,0 +1,52 @@
+# 快速開發容器
+
+> 來源：第 4 章「單一 Agent 開發」
+
+---
+
+## Docker Compose 開發環境
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=sqlite:///app.db
+      - NODE_ENV=development
+    command: npm run dev
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=dev
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_DB=app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+---
+
+## 使用方式
+
+```bash
+# 啟動開發環境
+docker-compose up -d
+
+# 查看日誌
+docker-compose logs -f
+
+# 停止
+docker-compose down
+```

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>表單元素範例</title>
+</head>
+<body>
+    <h1>表單範例</h1>
+    
+    <form action="/submit" method="POST">
+        <h2>文字輸入</h2>
+        <label for="name">姓名：</label>
+        <input type="text" id="name" name="name" placeholder="請輸入姓名"><br><br>
+        
+        <label for="email">Email：</label>
+        <input type="email" id="email" name="email" placeholder="example@mail.com"><br><br>
+        
+        <label for="password">密碼：</label>
+        <input type="password" id="password" name="password"><br><br>
+        
+        <h2>單選與多選</h2>
+        <p>性別：</p>
+        <input type="radio" id="male" name="gender" value="male">
+        <label for="male">男性</label>
+        <input type="radio" id="female" name="gender" value="female">
+        <label for="female">女性</label><br><br>
+        
+        <p>興趣（多選）：</p>
+        <input type="checkbox" id="reading" name="hobby" value="reading">
+        <label for="reading">閱讀</label>
+        <input type="checkbox" id="music" name="hobby" value="music">
+        <label for="music">音樂</label>
+        <input type="checkbox" id="sports" name="hobby" value="sports">
+        <label for="sports">運動</label><br><br>
+        
+        <h2>下拉選單</h2>
+        <label for="city">居住城市：</label>
+        <select id="city" name="city">
+            <option value="">請選擇</option>
+            <option value="taipei">台北</option>
+            <option value="taichung">台中</option>
+            <option value="kaohsiung">高雄</option>
+        </select><br><br>
+        
+        <h2>文字區域</h2>
+        <label for="message">訊息：</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" placeholder="請輸入訊息..."></textarea><br><br>
+        
+        <h2>其他輸入類型</h2>
+        <label for="birthday">生日：</label>
+        <input type="date" id="birthday" name="birthday"><br><br>
+        
+        <label for="color">喜歡的顏色：</label>
+        <input type="color" id="color" name="color" value="#0000ff"><br><br>
+        
+        <label for="quantity">數量：</label>
+        <input type="number" id="quantity" name="quantity" min="1" max="100"><br><br>
+        
+        <button type="submit">提交</button>
+        <button type="reset">重設</button>
+    </form>
+</body>
+</html>

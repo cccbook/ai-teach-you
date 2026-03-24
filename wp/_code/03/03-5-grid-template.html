@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Grid 模板範例</title>
+    <style>
+        .grid-container {
+            display: grid;
+            background-color: #f0f0f0;
+            padding: 10px;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .grid-item {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .grid-template {
+            grid-template-areas: 
+                "header header header"
+                "sidebar main main"
+                "footer footer footer";
+        }
+        
+        .header { grid-area: header; }
+        .sidebar { grid-area: sidebar; }
+        .main { grid-area: main; }
+        .footer { grid-area: footer; }
+        
+        .rows {
+            grid-template-rows: 50px 100px 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Grid 模板範例</h1>
+    
+    <h2>grid-template-areas</h2>
+    <div class="grid-container grid-template">
+        <div class="grid-item header">Header</div>
+        <div class="grid-item sidebar">Sidebar</div>
+        <div class="grid-item main">Main</div>
+        <div class="grid-item footer">Footer</div>
+    </div>
+    
+    <h2>grid-template-rows</h2>
+    <div class="grid-container rows">
+        <div class="grid-item">50px</div>
+        <div class="grid-item">100px</div>
+        <div class="grid-item">50px</div>
+    </div>
+    
+    <h2>合併網格 (grid-column, grid-row)</h2>
+    <div class="grid-container" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="grid-item" style="grid-column: 1/3;">佔 2 格</div>
+        <div class="grid-item">3</div>
+        <div class="grid-item" style="grid-row: 3/5;">佔 2 行</div>
+        <div class="grid-item">5</div>
+        <div class="grid-item">6</div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexbox 基礎範例</title>
+    <style>
+        .container {
+            display: flex;
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .item {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            margin: 5px;
+            text-align: center;
+        }
+        
+        .container-inline {
+            display: inline-flex;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flexbox 基礎範例</h1>
+    
+    <h2>display: flex</h2>
+    <div class="container">
+        <div class="item">項目 1</div>
+        <div class="item">項目 2</div>
+        <div class="item">項目 3</div>
+    </div>
+    
+    <h2>display: inline-flex</h2>
+    <div class="container container-inline">
+        <div class="item">項目 1</div>
+        <div class="item">項目 2</div>
+    </div>
+    <div class="container container-inline">
+        <div class="item">項目 A</div>
+        <div class="item">項目 B</div>
+    </div>
+</body>
+</html>

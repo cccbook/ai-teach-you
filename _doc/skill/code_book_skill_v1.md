@@ -100,6 +100,7 @@ mkdir -p book_dir/_code/{01,02,03,...,14}
 - **C**: 使用 `gcc` 編譯執行
 - **Python**: 使用 `python3` 直接執行
 - **Shell/Bash**: 使用 `bash` 執行
+- **Verilog**: 使用 `icarus + vvp` 執行
 
 #### 2. 測試命令
 

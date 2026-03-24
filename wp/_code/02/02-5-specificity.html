@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>選擇器優先級範例</title>
+    <style>
+        /* 優先級: 0-0-1 */
+        p {
+            color: blue;
+        }
+        
+        /* 優先級: 0-1-0 */
+        .intro {
+            color: green;
+        }
+        
+        /* 優先級: 1-0-0 */
+        #main {
+            color: red;
+        }
+        
+        /* 優先級: 1-1-1 (最高) */
+        #main.intro {
+            color: purple;
+        }
+        
+        /* 行內樣式優先級最高 */
+        .inline {
+            color: orange;
+        }
+        
+        /* !important 優先級 */
+        .important {
+            color: pink !important;
+        }
+    </style>
+</head>
+<body>
+    <p>藍色 - 元素選擇器 (優先級最低)</p>
+    <p class="intro">綠色 - 類別選擇器</p>
+    <p id="main">紅色 - ID 選擇器</p>
+    <p id="main" class="intro">紫色 - ID + 類別 (優先級最高)</p>
+    <p class="inline" style="color: brown;">棕色 - 行內樣式 (優先級更高)</p>
+    <p class="important">粉色 - !important (最高)</p>
+</body>
+</html>

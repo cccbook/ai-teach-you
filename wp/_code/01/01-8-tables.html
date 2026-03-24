@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>表格範例</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <h1>表格範例</h1>
+    
+    <h2>基本表格</h2>
+    <table>
+        <tr>
+            <th>姓名</th>
+            <th>年齡</th>
+            <th>城市</th>
+        </tr>
+        <tr>
+            <td>王小明</td>
+            <td>25</td>
+            <td>台北</td>
+        </tr>
+        <tr>
+            <td>李小華</td>
+            <td>30</td>
+            <td>高雄</td>
+        </tr>
+    </table>
+    
+    <h2>含標題與資料行的表格</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>產品</th>
+                <th>價格</th>
+                <th>數量</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>蘋果</td>
+                <td>$10</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>香蕉</td>
+                <td>$5</td>
+                <td>10</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2">總計</td>
+                <td>15</td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

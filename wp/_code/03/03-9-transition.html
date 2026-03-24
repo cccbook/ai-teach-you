@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>轉場效果範例</title>
+    <style>
+        .box {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            margin: 20px;
+            display: inline-block;
+        }
+        
+        .transition-basic {
+            transition: background-color 0.3s;
+        }
+        
+        .transition-basic:hover {
+            background-color: #FF5722;
+        }
+        
+        .transition-multiple {
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+        }
+        
+        .transition-multiple:hover {
+            width: 150px;
+            height: 150px;
+            background-color: #2196F3;
+        }
+        
+        .transition-all {
+            transition: all 0.5s;
+        }
+        
+        .transition-all:hover {
+            transform: scale(1.2);
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        
+        .transition-timing {
+            transition: transform 1s;
+        }
+        
+        .ease { transition-timing-function: ease; }
+        .ease-in { transition-timing-function: ease-in; }
+        .ease-out { transition-timing-function: ease-out; }
+        .ease-in-out { transition-timing-function: ease-in-out; }
+        .linear { transition-timing-function: linear; }
+        
+        .transition-timing:hover {
+            transform: translateX(200px);
+        }
+    </style>
+</head>
+<body>
+    <h1>轉場效果範例</h1>
+    
+    <h2>基本轉場</h2>
+    <div class="box transition-basic">hover 我</div>
+    
+    <h2>多重屬性</h2>
+    <div class="box transition-multiple">hover 我</div>
+    
+    <h2>所有屬性 + transform</h2>
+    <div class="box transition-all">hover 我</div>
+    
+    <h2>時間函數</h2>
+    <div class="box transition-timing ease">ease</div>
+    <div class="box transition-timing linear">linear</div>
+    <div class="box transition-timing ease-in-out">ease-in-out</div>
+</body>
+</html>

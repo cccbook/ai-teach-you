@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>CSS 選擇器範例</title>
+    <style>
+        /* 元素選擇器 */
+        p {
+            color: blue;
+        }
+        
+        /* 類別選擇器 */
+        .highlight {
+            background-color: yellow;
+        }
+        
+        /* ID 選擇器 */
+        #header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        
+        /* 複合選擇器 */
+        .content p {
+            font-size: 16px;
+        }
+        
+        /* 偽類選擇器 */
+        a:hover {
+            color: red;
+        }
+        
+        /* 萬用選擇器 */
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">這是 ID 選擇器 (header)</div>
+    <p>這是一般段落 (元素選擇器)</p>
+    <p class="highlight">這是類別選擇器 (highlight)</p>
+    <a href="#">連結 (偽類 :hover)</a>
+    <div class="content">
+        <p>這是 content 裡面的段落 (複合選擇器)</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "cursor": {
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 0.7,
+    "maxTokens": 4000
+  },
+  "editor": {
+    "fontSize": 14,
+    "tabSize": 2,
+    "wordWrap": "on",
+    "formatOnSave": true
+  },
+  "extensions": {
+    "autoUpdate": true,
+    "recommended": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "ms-python.python",
+      "bradlc.vscode-tailwindcss"
+    ]
+  },
+  "ai": {
+    "inlineHint": true,
+    "ghostText": true,
+    "tabComplete": true
+  }
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Grid 基礎範例</title>
+    <style>
+        .grid-container {
+            display: grid;
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .grid-item {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid white;
+        }
+        
+        .grid-cols {
+            grid-template-columns: 100px 100px 100px;
+        }
+        
+        .grid-auto {
+            grid-template-columns: auto auto auto;
+        }
+        
+        .grid-fr {
+            grid-template-columns: 1fr 2fr 1fr;
+        }
+        
+        .grid-gap {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Grid 基礎範例</h1>
+    
+    <h2>grid-template-columns: 固定寬度</h2>
+    <div class="grid-container grid-cols">
+        <div class="grid-item">1</div>
+        <div class="grid-item">2</div>
+        <div class="grid-item">3</div>
+    </div>
+    
+    <h2>grid-template-columns: auto</h2>
+    <div class="grid-container grid-auto">
+        <div class="grid-item">項目 1</div>
+        <div class="grid-item">項目 2</div>
+        <div class="grid-item">項目 3</div>
+    </div>
+    
+    <h2>grid-template-columns: fr</h2>
+    <div class="grid-container grid-fr">
+        <div class="grid-item">1fr</div>
+        <div class="grid-item">2fr</div>
+        <div class="grid-item">1fr</div>
+    </div>
+    
+    <h2>gap: 行距與列距</h2>
+    <div class="grid-container grid-gap">
+        <div class="grid-item">1</div>
+        <div class="grid-item">2</div>
+        <div class="grid-item">3</div>
+    </div>
+</body>
+</html>

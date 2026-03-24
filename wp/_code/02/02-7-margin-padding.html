@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Margin 與 Padding 範例</title>
+    <style>
+        .box {
+            background-color: #e0f7fa;
+            border: 2px solid #006064;
+            color: #006064;
+        }
+        
+        .margin-all {
+            margin: 20px;
+        }
+        
+        .margin-sides {
+            margin: 10px 30px;
+        }
+        
+        .margin-individual {
+            margin-top: 10px;
+            margin-right: 20px;
+            margin-bottom: 30px;
+            margin-left: 40px;
+        }
+        
+        .padding-all {
+            padding: 20px;
+        }
+        
+        .padding-sides {
+            padding: 10px 30px;
+        }
+        
+        .margin-auto {
+            width: 300px;
+            margin: 20px auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Margin 與 Padding 範例</h1>
+    
+    <div class="box margin-all">margin: 20px (四邊)</div>
+    <div class="box margin-sides">margin: 10px 30px (上下 左右)</div>
+    <div class="box margin-individual">個別 margin 值</div>
+    <div class="box padding-all">padding: 20px (四邊)</div>
+    <div class="box padding-sides">padding: 10px 30px (上下 左右)</div>
+    <div class="box margin-auto">margin: auto (水平置中)</div>
+</body>
+</html>

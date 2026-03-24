@@ -1,56 +1,77 @@
-# 向 AI 學計算機結構
+# 計算機結構——使用 Verilog 實作設計
+
+## 書籍概述
+
+本書以 Verilog 硬體描述語言實作各種計算機結構元件，從基礎的數位邏輯電路開始，逐步建構完整的處理器系統。理論與實作並重，每個單元都配有可執行的 Verilog 程式碼範例。
+
+## 目錄結構
+
+### 第一部分：數位邏輯基礎
+
+| 章節 | 說明 |
+|------|------|
+| [01-數位邏輯基礎](./01-digital-logic-basics.md) | 布林代數、邏輯閘、真值表 |
+| [02-組合邏輯電路](./02-combinational-logic.md) | 多工器、解多工器、編碼器、解碼器 |
+| [03-序向邏輯電路](./03-sequential-logic.md) | 正反器、暫存器、計數器 |
+
+### 第二部分：Verilog 語言基礎
+
+| 章節 | 說明 |
+|------|------|
+| [04-Verilog 語法入門](./04-verilog-basics.md) | 模組、資料類型、運算子 |
+| [05-Verilog 模組設計](./05-verilog-module-design.md) | 結構化設計、階層式設計 |
+
+### 第三部分：計算機結構核心元件
+
+| 章節 | 說明 |
+|------|------|
+| [06-算術邏輯單元](./06-arithmetic-logic-unit.md) | ALU 加減乘除、邏輯運算 |
+| [07-暫存器與暫存器檔案](./07-registers-register-file.md) | 暫存器堆疊、讀寫控制 |
+| [08-記憶體設計](./08-memory.md) | ROM、RAM、指令記憶體、資料記憶體 |
+
+### 第四部分：處理器設計
+
+| 章節 | 說明 |
+|------|------|
+| [09-控制單元](./09-control-unit.md) | 微程式控制、指令解碼 |
+| [10-指令集架構](./10-instruction-set.md) | 指令格式、定址模式 |
+| [11-單週期處理器](./11-single-cycle-processor.md) | MIPS 指令集實作 |
+| [12-多週期處理器](./12-multi-cycle-processor.md) | 狀態機設計 |
+| [13-管線化處理器](./13-pipelined-processor.md) | 五級管線、資料 hazard |
+
+### 第五部分：記憶體與效能
+
+| 章節 | 說明 |
+|------|------|
+| [14-快取記憶體](./14-cache-memory.md) | 直接映射、關聯映射 |
+| [15-虛擬記憶體](./15-virtual-memory.md) | 分頁、TLB |
+| [16-效能分析與優化](./16-performance-optimization.md) | Amdahl 定律、管線優化 |
+
+### 第六部分：進階主題
+
+| 章節 | 說明 |
+|------|------|
+| [17-輸入輸出系統](./17-io-system.md) | 中斷、DMA |
+| [18-平行處理](./18-parallel-processing.md) | 多核心、向量處理器 |
+| [19-現代處理器技術](./19-modern-processor-techniques.md) | 超純量、預測執行 |
 
 ---
 
-## 目錄
+## 程式碼範例清單
 
-### 第一部分：計算機的基本概念
+請參考 [_code/code_list.md](../_code/code_list.md)
 
-* [1. AI 怎麼看計算機結構](01-what_is_computer_architecture.md)
-* [2. 計算機的層次結構](02-computer_abstraction_levels.md)
-* [3. 計算機簡史與AI的詮釋](03-computer_history_ai_perspective.md)
+## 執行環境
 
-### 第二部分：數位邏輯基礎
+- Icarus Verilog (iverilog)
+- Verilog 標準：IEEE 1364-2005
 
-* [4. 二進位與布林代數](04-binary_boolean_algebra.md)
-* [5. 組合邏輯電路](05-combinational_logic.md)
-* [6. 序向邏輯電路](06-sequential_logic.md)
-* [7. 算術邏輯單元設計](07-alu_design.md)
+## 專有名詞索引
 
-### 第三部分：指令集架構視角
+請參考 [index/README.md](./index/README.md)
 
-* [8. 指令集分類](08-instruction_set_classification.md)
-* [9. 定址模式與指令格式](09-addressing_modes.md)
-* [10. 組譯器與機器碼](10-assembler_machine_code.md)
-* [11. 主流架構比較：x86、ARM、RISC-V](11-主流架構比較.md)
+## 附錄
 
-### 第四部分：透視 CPU 設計
-
-* [12. 簡易 CPU 設計](12-simple_cpu_design.md)
-* [13. 資料路徑與控制單元](13-datapath_control_unit.md)
-* [14. 管線化技術](14-pipelining.md)
-* [15. 管線 hazards 與解決方案](15-pipeline_hazards.md)
-* [16. 分支預測](16-branch_prediction.md)
-
-### 第五部分：對記憶體層次的理解
-
-* [17. 快取記憶體原理](17-cache_memory.md)
-* [18. 快取映射策略](18-cache_mapping.md)
-* [19. 虛擬記憶體](19-virtual_memory.md)
-* [20. 分頁與分頁表](20-paging_page_tables.md)
-
-### 第六部分：處理輸入輸出與系統整合
-
-* [21. I/O 系統概述](21-io_systems.md)
-* [22. 中斷與 DMA](22-interrupts_dma.md)
-* [23. 匯流排與系統連接](23-bus_systems.md)
-
-### 第七部分：進階主題
-
-* [24. 多核與多處理器](24-multicore_multiprocessors.md)
-* [25. GPU 運算架構](25-gpu_computing.md)
-* [26. 量子計算基礎](26-quantum_computing_basics.md)
-
----
-
-*最後更新：2026-03-22*
+- [附錄 A：Verilog 快速參考](./appendix/appendix-a-verilog-quick-ref.md)
+- [附錄 B：MIPS 指令集](./appendix/appendix-b-mips-instruction-set.md)
+- [附錄 C：實驗環境建置](./appendix/appendix-c-environment-setup.md)

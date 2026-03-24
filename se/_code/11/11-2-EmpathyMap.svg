@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+  <rect width="500" height="400" fill="#f8f9fa"/>
+  <text x="250" y="25" text-anchor="middle" font-size="14" font-weight="bold">Empathy Map</text>
+  
+  <!-- Four quadrants -->
+  <rect x="20" y="40" width="210" height="150" fill="#e8f4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="125" y="60" text-anchor="middle" font-size="12" font-weight="bold">Sees 看到</text>
+  <text x="30" y="80" font-size="10">- 廣告</text>
+  <text x="30" y="100" font-size="10">- 評論</text>
+  <text x="30" y="120" font-size="10">- 競爭產品</text>
+  
+  <rect x="270" y="40" width="210" height="150" fill="#fef3e2" stroke="#e67e22" stroke-width="2"/>
+  <text x="375" y="60" text-anchor="middle" font-size="12" font-weight="bold">Hears 聽到</text>
+  <text x="280" y="80" font-size="10">- 朋友推薦</text>
+  <text x="280" y="100" font-size="10">- 網路評價</text>
+  
+  <rect x="20" y="210" width="210" height="150" fill="#f8e8e8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="125" y="230" text-anchor="middle" font-size="12" font-weight="bold">Thinks/Feels 想到/感受到</text>
+  <text x="30" y="250" font-size="10">- 價格考量</text>
+  <text x="30" y="270" font-size="10">- 學習曲線</text>
+  
+  <rect x="270" y="210" width="210" height="150" fill="#e8f8f0" stroke="#27ae60" stroke-width="2"/>
+  <text x="375" y="230" text-anchor="middle" font-size="12" font-weight="bold">Says/Does 說/做</text>
+  <text x="280" y="250" font-size="10">- 搜尋評測</text>
+  <text x="280" y="270" font-size="10">- 免費試用</text>
+</svg>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>響應式版面範例</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        nav {
+            background-color: #444;
+            overflow: hidden;
+        }
+        
+        nav a {
+            float: left;
+            display: block;
+            color: white;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        
+        nav a:hover {
+            background-color: #555;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .main-content {
+            flex: 3;
+            padding: 20px;
+            background-color: #f9f9f9;
+            min-width: 300px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            padding: 20px;
+            background-color: #e0e0e0;
+            min-width: 200px;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* 響應式 - 手機隱藏側邊欄 */
+        @media (max-width: 600px) {
+            nav a {
+                float: none;
+                text-align: center;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>響應式網頁</h1>
+    </header>
+    
+    <nav>
+        <a href="#home">首頁</a>
+        <a href="#about">關於</a>
+        <a href="#services">服務</a>
+        <a href="#contact">聯絡</a>
+    </nav>
+    
+    <div class="container">
+        <div class="main-content">
+            <h2>主要內容</h2>
+            <p>這是響應式版面的主要內容區域。</p>
+            <p>調整視窗寬度來查看版面的變化。</p>
+        </div>
+        <div class="sidebar">
+            <h3>側邊欄</h3>
+            <p>額外資訊</p>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2026 響應式網頁範例</p>
+    </footer>
+</body>
+</html>

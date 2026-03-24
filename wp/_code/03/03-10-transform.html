@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>2D/3D 轉換範例</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 20px;
+        }
+        
+        .box {
+            width: 80px;
+            height: 80px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .translate {
+            transform: translate(30px, 20px);
+        }
+        
+        .rotate {
+            transform: rotate(45deg);
+        }
+        
+        .scale {
+            transform: scale(1.5);
+        }
+        
+        .skew {
+            transform: skewX(20deg);
+        }
+        
+        .matrix {
+            transform: matrix(1, 0, 0.5, 1, 50, 0);
+        }
+        
+        .combo {
+            transform: translate(20px, 20px) rotate(30deg) scale(1.2);
+        }
+        
+        .rotate-3d {
+            transform: rotateX(45deg) rotateY(45deg);
+        }
+        
+        .perspective {
+            perspective: 500px;
+        }
+        
+        .translate-z {
+            transform: translateZ(50px);
+        }
+        
+        .transform-origin {
+            transform-origin: top left;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body>
+    <h1>2D/3D 轉換範例</h1>
+    
+    <div class="container">
+        <div class="box">原始</div>
+        <div class="box translate">translate</div>
+        <div class="box rotate">rotate</div>
+        <div class="box scale">scale</div>
+        <div class="box skew">skew</div>
+        <div class="box matrix">matrix</div>
+        <div class="box combo">combo</div>
+        <div class="box perspective rotate-3d">3D</div>
+        <div class="box perspective translate-z">translateZ</div>
+        <div class="box transform-origin">transform-origin</div>
+    </div>
+</body>
+</html>

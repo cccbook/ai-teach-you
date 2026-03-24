@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>顏色與背景範例</title>
+    <style>
+        .color-names {
+            color: blue;
+            background-color: lightyellow;
+        }
+        
+        .color-hex {
+            color: #ff5733;
+            background-color: #f0f0f0;
+        }
+        
+        .color-rgb {
+            color: rgb(0, 128, 0);
+            background-color: rgb(240, 248, 255);
+        }
+        
+        .color-rgba {
+            color: rgba(255, 0, 0, 0.8);
+            background-color: rgba(0, 0, 255, 0.1);
+        }
+        
+        .color-hsl {
+            color: hsl(120, 100%, 25%);
+            background-color: hsl(60, 100%, 90%);
+        }
+        
+        .gradient-linear {
+            background: linear-gradient(to right, red, yellow, green);
+            color: white;
+            padding: 20px;
+        }
+        
+        .gradient-radial {
+            background: radial-gradient(circle, yellow, orange, red);
+            color: white;
+            padding: 20px;
+        }
+        
+        .bg-image {
+            background-image: url('https://via.placeholder.com/300x100');
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>顏色與背景範例</h1>
+    
+    <div class="color-names">顏色名稱</div>
+    <div class="color-hex">十六進位顏色</div>
+    <div class="color-rgb">RGB 顏色</div>
+    <div class="color-rgba">RGBA 顏色 (含透明度)</div>
+    <div class="color-hsl">HSL 顏色</div>
+    <div class="gradient-linear">線性漸層</div>
+    <div class="gradient-radial">放射漸層</div>
+    <div class="bg-image">背景圖片</div>
+</body>
+</html>

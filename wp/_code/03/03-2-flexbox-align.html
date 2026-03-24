@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexbox 對齊範例</title>
+    <style>
+        .container {
+            display: flex;
+            background-color: #f0f0f0;
+            height: 150px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .item {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            margin: 5px;
+            width: 60px;
+        }
+        
+        .justify-start { justify-content: flex-start; }
+        .justify-end { justify-content: flex-end; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+        .justify-evenly { justify-content: space-evenly; }
+        
+        .align-start { align-items: flex-start; }
+        .align-end { align-items: flex-end; }
+        .align-center { align-items: center; }
+        .align-stretch { align-items: stretch; }
+    </style>
+</head>
+<body>
+    <h1>Flexbox 對齊範例</h1>
+    
+    <h2>justify-content (主軸)</h2>
+    <div class="container justify-start">
+        <div class="item">1</div><div class="item">2</div><div class="item">3</div>
+    </div>
+    <div class="container justify-center">
+        <div class="item">1</div><div class="item">2</div><div class="item">3</div>
+    </div>
+    <div class="container justify-between">
+        <div class="item">1</div><div class="item">2</div><div class="item">3</div>
+    </div>
+    
+    <h2>align-items (交錯軸)</h2>
+    <div class="container align-start">
+        <div class="item">1</div><div class="item">2</div><div class="item">3</div>
+    </div>
+    <div class="container align-center">
+        <div class="item">1</div><div class="item">2</div><div class="item">3</div>
+    </div>
+    <div class="container align-stretch">
+        <div class="item" style="height:auto">1</div><div class="item" style="height:auto">2</div><div class="item" style="height:auto">3</div>
+    </div>
+</body>
+</html>

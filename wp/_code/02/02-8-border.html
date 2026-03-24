@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>邊框與陰影範例</title>
+    <style>
+        .box {
+            width: 150px;
+            height: 100px;
+            margin: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .solid {
+            border: 3px solid #333;
+        }
+        
+        .dashed {
+            border: 3px dashed #333;
+        }
+        
+        .dotted {
+            border: 3px dotted #333;
+        }
+        
+        .double {
+            border: 5px double #333;
+        }
+        
+        .radius {
+            border: 3px solid #333;
+            border-radius: 15px;
+        }
+        
+        .circle {
+            width: 100px;
+            border: 3px solid #333;
+            border-radius: 50%;
+        }
+        
+        .shadow {
+            border: 2px solid #333;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+        }
+        
+        .inset-shadow {
+            border: 2px solid #333;
+            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.3);
+        }
+        
+        .multi-shadow {
+            border: 2px solid #333;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.3), 
+                        -3px -3px 5px rgba(255,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>邊框與陰影範例</h1>
+    
+    <div class="box solid">solid</div>
+    <div class="box dashed">dashed</div>
+    <div class="box dotted">dotted</div>
+    <div class="box double">double</div>
+    <div class="box radius">圓角</div>
+    <div class="box circle">圓形</div>
+    <div class="box shadow">陰影</div>
+    <div class="box inset-shadow">內陰影</div>
+    <div class="box multi-shadow">多重陰影</div>
+</body>
+</html>

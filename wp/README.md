@@ -1,10 +1,8 @@
-# E-Book: Let AI teach you Web Programming
+# E-Book: Full-Stack Web Development with Modern Technologies
 
-> A book for human web programmer
+> A comprehensive guide to building modern web applications
 
 > Author: Big Pickle at OpenCode
-
-> CoAuthor: [ccckmit](https://github.com/ccckmit) at [National Quemoy University](https://www.nqu.edu.tw/)
 
 ---
 
@@ -12,21 +10,14 @@
 
 | Language | Title |
 |----------|-------|
-| [English](en/README.md) | Let AI teach you Web Programming |
-| [繁體中文](tw/README.md) | 讓 AI 教你設計網站 |
+| [繁體中文](tw/README.md) | 現代 Web 全端開發：HTML/CSS/JavaScript/FastAPI/React |
 
-## Core Code
+## Technology Stack
 
-### Reference Sources
-
-* https://github.com/fastapi/fastapi
-
-### Book Example Code
-
-* [_code/hmtl/](_code/html/)
-* [_code/css/](_code/css/)
-* [_code/js/](_code/js/) 
+* **Frontend**: HTML5, CSS3, JavaScript (ES6+), React 18
+* **Backend**: FastAPI (Python)
+* **Protocol**: REST API, WebSocket
 
 ---
 
-*Last updated：2026-03-22*
+*Last updated：2026-03-24*
