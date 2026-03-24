@@ -15,26 +15,26 @@
 ### 第二部分：神經網路
 
 * [4. 機器學習與 Scikit-Learn 套件](04-machine_learning.md)
-* [5. 神經網路，深度學習與 PyTorch 套件](05-nn_pytorch.md)
-* [6. 從梯度下降法到反傳遞演算法](06-gd_backprop.md)
-* [7. 從感知器到多層感知器](07-mlp.md)
+* [5. 神經網路，深度學習與 PyTorch 套件](05-neural_neworks.md)
+* [6. 從梯度下降法到反傳遞演算法](06-gradient_descent.md)
+* [7. 從感知器到多層感知器](07-perceptron_mlp.md)
 * [8. 卷積神經網路](08-cnn.md)
 * [9. 循環神經網路](09-rnn.md)
 * [10. 生成對抗網路](10-gan.md)
 
 ### 第三部分：現代語言模型與 Transformer
 
-* [11. 現代語言模型簡介](11-llm.md)
-* [12. 注意力，Transformer 與 GPT](12-attention_gpt.md)
-* [13. 最新語言模型的進展與方法 (2018-現在)](13-llm_new.md)
+* [11. 現代語言模型簡介](11-language_models.md)
+* [12. 注意力，Transformer 與 GPT](12-transformer.md)
+* [13. 最新語言模型的進展與方法 (2018-現在)](13-llm.md)
 
 ### 第四部分：Transformer 之後與世界模型
 
-* [14. 視覺與聽覺模型](14-vision_audio_model.md)
-* [15. 生成式 AI (Generative AI)](15-gen_ai.md)
-* [16. 多模態的模型](16-multi_mode_model.md)
+* [14. 視覺與聽覺模型](14-vision_audio.md)
+* [15. 生成式 AI (Generative AI)](15-generative_ai.md)
+* [16. 多模態的模型](16-multimodel.md)
 * [17. 代理人技術](17-agent.md)
-* [18. 強化學習 (Reinforcement Learning)](18-rl.md)
+* [18. 強化學習 (Reinforcement Learning)](18-reinforcement_learning.md)
 * [19. 世界模型](19-world_model.md)
 
 ### 附錄
