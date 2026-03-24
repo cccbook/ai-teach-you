@@ -15,7 +15,7 @@
 ### 第二部分：神經網路
 
 * [4. 機器學習與 Scikit-Learn 套件](04-machine_learning.md)
-* [5. 神經網路，深度學習與 PyTorch 套件](05-neural_neworks.md)
+* [5. 神經網路，深度學習與 PyTorch 套件](05-neural_networks.md)
 * [6. 從梯度下降法到反傳遞演算法](06-gradient_descent.md)
 * [7. 從感知器到多層感知器](07-perceptron_mlp.md)
 * [8. 卷積神經網路](08-cnn.md)
