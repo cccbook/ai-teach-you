@@ -12,7 +12,7 @@
 |----------|-------|--------------------|--------------|
 | [sh](sh/README.md) | Let AI teach you shell | Shell Script | [English](sh/en/README.md) / [繁體](sh/tw/README.md) / [简体](sh/cn/README.md) / [日本語](sh/ja/README.md) / [한국어](sh/ko/README.md)<br/>[Español](sh/es/README.md) / [Français](sh/fr/README.md) / [Deutsch](sh/de/README.md) / [Português](sh/pt/README.md)<br/>[Русский](sh/ru/README.md) / [Tiếng Việt](sh/vi/README.md) / [ภาษาไทย](sh/th/README.md) |
 | [se](se/README.md) | Let AI teach you Software Engineering | Python | [English](se/en/README.md) / [繁體](se/tw/README.md) |
-| [wp](wp/README.md) | Let AI teach you Web Programming | HTML/CSS<br/>JavaScript React<br/>Python FastAPI | [English](wp/en/README.md) / [繁體](wp/tw/README.md) |
+| [wp](wp/README.md) | Let AI teach you Web Programming | HTML+CSS<br/>JavaScript+React<br/>Python+FastAPI | [English](wp/en/README.md) / [繁體](wp/tw/README.md) |
 | [sp](sp/README.md) | Let AI teach you System Programming | Python/C | [English](sp/en/README.md) / [繁體](sp/tw/README.md) |
 | [ai](ai/README.md) | Let AI Teach You Modern AI | Python | [English](ai/en/README.md) / [繁體](ai/tw/README.md) |
 | [alg](alg/README.md) | Let AI teach you Algorithm | Python | Waiting ... |
