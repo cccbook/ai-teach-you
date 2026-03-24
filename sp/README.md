@@ -1,4 +1,4 @@
-# E-Book: Let AI teach you System Programming
+# E-Book: Let AI teach you System Software
 
 > A book for human system programmer
 
@@ -12,7 +12,7 @@
 
 | Language | Title |
 |----------|-------|
-| [English](en/README.md) | Let AI teach you System Programming |
+| [English](en/README.md) | Let AI teach you System Software |
 | [繁體中文](tw/README.md) | 讓 AI 教你系統程式 |
 
 ## Core Code

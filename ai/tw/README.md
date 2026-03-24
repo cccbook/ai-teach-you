@@ -1,63 +1,57 @@
-# 讓 AI 教你現代 AI
+# 讓 AI 教你人工智慧 -- 以 PyTorch 實作 
 
-> 用 micrograd 理解梯度，用 microgpt 理解大語言模型
+> 作者：[OpenCode](https://opencode.ai/) + Big Pickle 模型
 
----
+> 編輯：[陳鍾誠](https://csie.nqu.edu.tw/p/404-1038-2377.php?Lang=zh-tw) ( [ccckmit](https://github.com/ccckmit) )
 
 ## 目錄
 
-### 第一部分：機器學習基礎
+### 第一部分：簡介
 
-* [1. 機器學習的第一步——從預測到學習](01-ml_basics.md)
-* [2. 讓機器從錯誤中學習——梯度與梯度下降](02-gradient_descent.md)
-* [3. 反向傳播——自動微分的魔法](03-backpropagation.md)
-* [4. 用 micrograd 從零理解自動微分](04-micrograd.md)
+* [1. AI 的歷史](01-ai_history.md) 
+* [2. 傳統 AI 技術 (1950-2010) 簡介 -- 演算法主導的 AI](02-early_ai.md)
+* [3. 現代 AI 技術 (2010-現在) 簡介 -- 模型主導的 AI](03-modern_ai.md)
 
-### 第二部分：文字的數學與 Transformer
+### 第二部分：神經網路
 
-* [5. 文字的數學——Token 化與 Embedding](05-embedding.md)
-* [6. Transformer——注意力的藝術](06-transformer.md)
-* [7. Self-Attention 機制解析](07-self_attention.md)
+* [4. 機器學習與 Scikit-Learn 套件](04-machine_learning.md)
+* [5. 神經網路，深度學習與 PyTorch 套件](05-nn_pytorch.md)
+* [6. 從梯度下降法到反傳遞演算法](06-gd_backprop.md)
+* [7. 從感知器到多層感知器](07-mlp.md)
+* [8. 卷積神經網路](08-cnn.md)
+* [9. 循環神經網路](09-rnn.md)
+* [10. 生成對抗網路](10-gan.md)
 
-### 第三部分：用 microgpt 從零理解 GPT
+### 第三部分：現代語言模型與 Transformer
 
-* [8. microgpt.py 完整解析——資料、Tokenizer、架構](08-microgpt_overview.md)
-* [9. GPT 架構：Embedding → Transformer 層 → LM Head](09-gpt_architecture.md)
-* [10. 訓練循環與 Adam 優化器](10-training_loop.md)
-* [11. 生成新名字——溫度與隨機性](11-generation.md)
+* [11. 現代語言模型簡介](11-llm.md)
+* [12. 注意力，Transformer 與 GPT](12-attention_gpt.md)
+* [13. 最新語言模型的進展與方法 (2018-現在)](13-llm_new.md)
 
-### 第四部分：從 microgpt 到 ChatGPT
+### 第四部分：Transformer 之後與世界模型
 
-* [12. 預訓練的力量](12-pretraining.md)
-* [13. SFT：監督式微調](13-sft.md)
-* [14. RLHF：從人類回饋中學習](14-rlhf.md)
-* [15. Prompt Engineering：與模型對話的藝術](15-prompt_engineering.md)
+* [14. 視覺與聽覺模型](14-vision_audio_model.md)
+* [15. 生成式 AI (Generative AI)](15-gen_ai.md)
+* [16. 多模態的模型](16-multi_mode_model.md)
+* [17. 代理人技術](17-agent.md)
+* [18. 強化學習 (Reinforcement Learning)](18-rl.md)
+* [19. 世界模型](19-world_model.md)
 
-### 第五部分：AI 的能力、限制與未來
+### 附錄
 
-* [16. AI 擅長的事與缺陷](16-capabilities_limits.md)
-* [17. 幻覺、偏見與安全](17-hallucination_safety.md)
-* [18. 上下文窗口與 Agent](18-context_agent.md)
-* [19. AI 的未來——當前瓶頸與發展方向](19-future.md)
+* [附錄 A：PyTorch 深度學習框架詳解](appendix-a-pytorch.md)
+* [附錄 B：數學基礎](appendix-b-math.md)
+* [附錄 C：專有名詞](./index/README.md)
+* [附錄 D：參考資源](appendix-d-resources.md)
 
----
+## 程式碼範例
 
-## 核心程式碼
+* [程式碼範例清單](../_code/code_list.md)
 
-### 參考來源
+## 參考資源
 
-* [micrograd](https://github.com/karpathy/micrograd) - 自動微分引擎
-* [microgpt](https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95) - 完整 GPT 實現
+* [micrograd](https://github.com/karpathy/micrograd)
+* [microgpt](https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95)
+* [mini-openclaw.py](https://gist.github.com/dabit3/86ee04a1c02c839409a02b20fe99a492)
 
-### 本書範例程式碼
-
-* [_code/nn0py/nn0.py](../_code/nn0py/nn0.py) - 自動微分引擎（自動梯度計算）
-* [_code/nn0py/gpt0.py](../_code/nn0py/gpt0.py) - GPT 模型實作
-* [_code/nn0py/cnn0.py](../_code/nn0py/cnn0.py) - CNN 模型實作
-* [_code/nn0py/test_gpt0.py](../_code/nn0py/test_gpt0.py) - GPT 訓練與推理測試
-* [_code/gd/gd.py](../_code/gd/gd.py) - 梯度下降實作（數值微分）
-* [_code/gd/gd_array.py](../_code/gd/gd_array.py) - 向量化梯度下降
-
----
-
-*最後更新：2026-03-22*
+*最後更新：2026-03-24*
