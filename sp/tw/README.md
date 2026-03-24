@@ -1,4 +1,4 @@
-# 讓 AI 教你系統程式 -- 理論與實作
+# 讓 AI 教你系統軟體 -- 理論與實作
 
 > 作者：[OpenCode](https://opencode.ai/) + Big Pickle 模型
 
