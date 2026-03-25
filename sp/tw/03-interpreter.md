@@ -103,16 +103,58 @@
 
 作用域（Scope）決定了識別字的可見性：
 
-```python
-x = 10                    # 全域作用域
+[_code/03/03_05_scope_management.c](_code/03/03_05_scope_management.c)
 
-def outer():
-    y = 20                # outer 的作用域
-    def inner():
-        z = 30            # inner 的作用域
-        print(x, y, z)   # 可見 x, y, z
-    inner()
-    # print(z)           # 錯誤：z 不可見
+```c
+#include <stdio.h>
+#include <string.h>
+
+typedef enum { GLOBAL, LOCAL, INNER } ScopeType;
+
+typedef struct {
+    char name[32];
+    int value;
+    ScopeType type;
+} Variable;
+
+void demonstrate_scope() {
+    printf("=== Scope Management ===\n\n");
+    
+    printf("x = 10  (global scope)\n\n");
+    printf("void outer() {\n");
+    printf("    y = 20  (outer's scope)\n\n");
+    printf("    void inner() {\n");
+    printf("        z = 30  (inner's scope)\n");
+    printf("        print(x, y, z)  // Visible: x, y, z\n");
+    printf("    }\n");
+    printf("}\n\n");
+    
+    printf("Variable lookup order (lexical scope):\n");
+    printf("  1. Current scope\n");
+    printf("  2. Parent scope\n");
+    printf("  3. ... (continues until global scope)\n\n");
+    
+    printf("Scope Implementation Strategies:\n");
+    printf("  1. Lexical Scope: Determined by source structure\n");
+    printf("  2. Dynamic Scope: Determined by call stack\n");
+    
+    printf("\nC Scope Example:\n");
+    int x = 10;
+    printf("  Global x = %d\n", x);
+    {
+        int y = 20;
+        printf("  Outer scope y = %d\n", y);
+        {
+            int z = 30;
+            printf("  Inner scope z = %d\n", z);
+        }
+    }
+}
+
+int main() {
+    demonstrate_scope();
+    return 0;
+}
 ```
 
 **作用域實現策略**
@@ -329,27 +371,43 @@ int main() {
 
 Lua 5.0 從堆疊式改為暫存器式，效能提升顯著。
 
-```python
-# 基於暫存器的 VM 與堆疊式 VM 的比較
-print("=== 基於堆疊 VM ===")
-# 計算 1 + 2:
-stack_bytecode = [
-    'iconst', 1,    # 推入 1
-    'iconst', 2,    # 推入 2
-    'iadd',         # 彈出並相加，結果推回
-    'print',        # 輸出
-    'halt'
-]
+[_code/03/03_06_register_vs_stack.c](_code/03/03_06_register_vs_stack.c)
 
-print("\n=== 基於暫存器 VM ===")
-# 計算 1 + 2:
-register_bytecode = [
-    'LOADK', 0, 1,     # R0 = 1
-    'LOADK', 1, 2,     # R1 = 2
-    'ADD', 2, 0, 1,    # R2 = R0 + R1
-    'PRINT', 2,        # 輸出 R2
-    'HALT'
-]
+```c
+#include <stdio.h>
+
+void print_stack_based_vm() {
+    printf("=== Stack-based VM ===\n\n");
+    
+    printf("Computing 1 + 2:\n");
+    printf("Stack Operations:\n");
+    printf("  iconst 1    // Push 1 onto stack -> Stack: [1]\n");
+    printf("  iconst 2    // Push 2 onto stack -> Stack: [1, 2]\n");
+    printf("  iadd        // Pop 2, Pop 1, Push 3 -> Stack: [3]\n");
+    printf("  print       // Print 3\n\n");
+    
+    printf("Stack bytecode:\n  [iconst 1, iconst 2, iadd, print, halt]\n\n");
+}
+
+void print_register_based_vm() {
+    printf("=== Register-based VM ===\n\n");
+    
+    printf("Computing 1 + 2:\n");
+    printf("Register Operations:\n");
+    printf("  LOADK R0, 1    // R0 = 1\n");
+    printf("  LOADK R1, 2    // R1 = 2\n");
+    printf("  ADD R2, R0, R1 // R2 = R0 + R1\n");
+    printf("  PRINT R2       // Print R2\n\n");
+    
+    printf("Register bytecode:\n  [LOADK 0 1, LOADK 1 2, ADD 2 0 1, PRINT 2, HALT]\n\n");
+}
+
+int main() {
+    printf("=== Stack vs Register-based VM ===\n\n");
+    print_stack_based_vm();
+    print_register_based_vm();
+    return 0;
+}
 ```
 
 ### 3.2.4 位元組碼設計原則
@@ -491,47 +549,73 @@ Phase 2: 清除（Sweep）
 - 呼叫堆疊上的參照
 - 暫存器內容
 
-```python
-# 標記-清除 GC 實作
-class MarkSweepGC:
-    def __init__(self):
-        self.heap = []  # 堆記憶體
-        self.roots = set()  # 根集合
+[_code/03/03_07_mark_sweep_gc.c](_code/03/03_07_mark_sweep_gc.c)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_HEAP 100
+
+typedef struct {
+    int id;
+    int size;
+    int marked;
+    void* data;
+} Object;
+
+Object* heap[MAX_HEAP];
+int heap_count = 0;
+
+Object* allocate(int size) {
+    Object* obj = (Object*)malloc(sizeof(Object));
+    obj->id = heap_count++;
+    obj->marked = 0;
+    obj->data = malloc(size);
+    printf("  Allocated object %d\n", obj->id);
+    return obj;
+}
+
+void mark(Object* obj) {
+    if (!obj || obj->marked) return;
+    obj->marked = 1;
+    printf("  Marked object %d\n", obj->id);
+}
+
+void sweep() {
+    int freed = 0;
+    for (int i = 0; i < heap_count; i++) {
+        if (!heap[i]->marked) {
+            printf("  Freeing object %d\n", heap[i]->id);
+            free(heap[i]->data);
+            free(heap[i]);
+            freed++;
+        }
+    }
+    printf("  Freed %d objects\n", freed);
+}
+
+int main() {
+    printf("=== Mark-Sweep GC ===\n\n");
     
-    def allocate(self, size):
-        """配置記憶體"""
-        obj = {'id': len(self.heap), 'size': size, 'marked': False, 'data': None}
-        self.heap.append(obj)
-        return obj['id']
+    Object* obj1 = allocate(100);
+    Object* obj2 = allocate(200);
+    Object* obj3 = allocate(300);
     
-    def mark(self, obj_id):
-        """標記階段：標記所有可達物件"""
-        obj = self.heap[obj_id]
-        if obj['marked']:
-            return
-        obj['marked'] = True
-        # 遞迴標記可達物件
+    printf("\nMark phase (from roots):\n");
+    mark(obj1);
+    mark(obj3);
     
-    def sweep(self):
-        """清除階段：回收未標記的物件"""
-        freed = []
-        for obj in self.heap:
-            if not obj['marked']:
-                freed.append(obj['id'])
-        self.heap = [obj for obj in self.heap if obj['marked']]
-        return freed
+    printf("\nSweep phase:\n");
+    sweep();
     
-    def collect(self):
-        """執行完整 GC"""
-        # 1. 標記
-        for root in self.roots:
-            self.mark(root)
-        # 2. 清除
-        freed = self.sweep()
-        # 3. 取消標記
-        for obj in self.heap:
-            obj['marked'] = False
-        print(f"GC 完成，回收 {len(freed)} 個物件")
+    printf("\nAlgorithm:\n");
+    printf("  1. Mark: Mark all reachable objects from roots\n");
+    printf("  2. Sweep: Free all unmarked objects\n");
+    
+    return 0;
+}
 ```
 
 **標記-清除的問題**
@@ -559,32 +643,83 @@ GC 時：
 2. 交換 From/To Space
 ```
 
-```python
-# 複製 GC 實作
-class CopyGC:
-    def __init__(self, from_space, to_space):
-        self.from_space = from_space
-        self.to_space = to_space
-        self.current_space = from_space
+[_code/03/03_08_copy_gc.c](_code/03/03_08_copy_gc.c)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SPACE_SIZE 50
+
+typedef struct {
+    int id;
+    int alive;
+    int forwarded_to;
+} Object;
+
+typedef struct {
+    Object* objects[SPACE_SIZE];
+    int count;
+} Space;
+
+Space from_space = {.count = 0};
+Space to_space = {.count = 0};
+Space* current;
+
+Object* allocate(int size) {
+    Object* obj = (Object*)malloc(sizeof(Object));
+    obj->id = current->count++;
+    obj->alive = 1;
+    obj->forwarded_to = -1;
+    current->objects[obj->id] = obj;
+    printf("  Allocated object %d\n", obj->id);
+    return obj;
+}
+
+Object* forward(Object* obj) {
+    if (!obj || obj->forwarded_to >= 0) {
+        return obj;
+    }
+    Object* new_obj = allocate(0);
+    obj->forwarded_to = new_obj->id;
+    printf("  Forwarded object %d -> %d\n", obj->id, new_obj->id);
+    return new_obj;
+}
+
+void collect(Object* roots[], int n) {
+    printf("\n=== Copy GC Collection ===\n");
+    printf("Swapping spaces...\n\n");
     
-    def copy(self, obj):
-        """將存活物件複製到 To Space"""
-        new_obj = obj.copy()
-        self.to_space.append(new_obj)
-        return new_obj
+    Space* temp = current;
+    current = &to_space;
+    to_space = *temp;
+    current->count = 0;
     
-    def collect(self):
-        """GC 觸發時，交換空間並複製存活物件"""
-        old_space = self.current_space
-        new_space = self.to_space if self.current_space == self.from_space else self.from_space
-        
-        new_space.clear()
-        for obj in old_space:
-            if obj['alive']:
-                self.copy(obj)
-        
-        self.current_space = new_space
-        print(f"GC 完成，存活物件數: {len(new_space)}")
+    printf("Copying live objects:\n");
+    for (int i = 0; i < n; i++) {
+        roots[i] = forward(roots[i]);
+    }
+    printf("\n  Surviving: %d objects\n", current->count);
+}
+
+int main() {
+    printf("=== Copy Garbage Collection ===\n\n");
+    
+    current = &from_space;
+    Object* obj1 = allocate(100);
+    Object* obj2 = allocate(200);
+    Object* obj3 = allocate(300);
+    
+    Object* roots[] = {obj1, obj3};
+    collect(roots, 2);
+    
+    printf("\nProperties:\n");
+    printf("  + No memory fragmentation\n");
+    printf("  + Mark + copy in one pass\n");
+    printf("  - Uses only half of memory\n");
+    
+    return 0;
+}
 ```
 
 **複製 GC 的優缺點**

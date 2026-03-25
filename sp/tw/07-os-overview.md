@@ -233,36 +233,41 @@ int main() {
 | 通訊 | 需要 IPC | 直接共享記憶體 |
 | 建立速度 | 較慢 | 較快 |
 
-```python
-class Thread:
-    """執行緒類別"""
-    def __init__(self, process, target):
-        self.process = process
-        self.target = target
-        self.thread = threading.Thread(target=target)
-```
+[_code/07/07_08_thread_implementation.c](_code/07/07_08_thread_implementation.c)
 
-**多執行緒範例**
+```c
+#include <stdio.h>
 
-```python
-import threading
-import time
+typedef struct {
+    int tid;
+    char name[32];
+    pthread_t handle;
+    void* stack;
+} Thread;
 
-def worker(name, delay):
-    for i in range(3):
-        print(f"執行緒 {name}: 第 {i+1} 次執行")
-        time.sleep(delay)
-
-threads = []
-for i in range(3):
-    t = threading.Thread(target=worker, args=(f"Worker-{i}", 0.5))
-    threads.append(t)
-    t.start()
-
-for t in threads:
-    t.join()
-
-print("所有執行緒完成")
+int main() {
+    printf("=== Thread Implementation ===\n\n");
+    
+    printf("Thread structure:\n");
+    printf("  typedef struct {\n");
+    printf("      int tid;           // Thread ID\n");
+    printf("      char name[32];    // Thread name\n");
+    printf("      pthread_t handle;  // POSIX thread handle\n");
+    printf("      void* stack;      // Stack pointer\n");
+    printf("  } Thread;\n\n");
+    
+    printf("Process vs Thread:\n");
+    printf("+------------------+------------------+\n");
+    printf("|     Process       |     Thread       |\n");
+    printf("+------------------+------------------+\n");
+    printf("| Separate address  | Shared address   |\n");
+    printf("| space             | space            |\n");
+    printf("| Higher overhead   | Lower overhead   |\n");
+    printf("| IPC required      | Direct sharing   |\n");
+    printf("+------------------+------------------+\n");
+    
+    return 0;
+}
 ```
 
 ## 7.3 行程排程
@@ -327,26 +332,38 @@ int main() {
 
 **最短工作優先（SJF）**
 
-```python
-class SJFScheduler:
-    """Shortest Job First"""
-    
-    def __init__(self):
-        self.queue = []
-    
-    def add_process(self, process):
-        heapq.heappush(self.queue, (process.burst_time, process))
-    
-    def next_process(self):
-        if self.queue:
-            return heapq.heappop(self.queue)[1]
-        return None
-```
+[_code/07/07_09_sjf_scheduler.c](_code/07/07_09_sjf_scheduler.c)
 
-特點：
-- 最小化平均等待時間
-- 需要事先知道程式執行時間
-- 可能導致長程式飢餓
+```c
+#include <stdio.h>
+
+typedef struct {
+    int pid;
+    char name[16];
+    int burst_time;
+} Process;
+
+int main() {
+    printf("=== SJF Scheduler ===\n\n");
+    
+    Process procs[] = {
+        {1, "P1", 10},
+        {2, "P2", 5},
+        {3, "P3", 8},
+        {4, "P4", 3}
+    };
+    
+    printf("Scheduling order (shortest first):\n");
+    printf("  P4 (3) -> P2 (5) -> P3 (8) -> P1 (10)\n\n");
+    
+    printf("Properties:\n");
+    printf("  + Minimizes average waiting time\n");
+    printf("  - Requires knowing burst time\n");
+    printf("  - Long jobs may starve\n");
+    
+    return 0;
+}
+```
 
 **時間片輪轉（Round Robin）**
 
@@ -590,15 +607,41 @@ int main() {
 
 每個檔案有一個 i-node（索引節點）儲存元資料：
 
-```python
-class Inode:
-    def __init__(self, inumber):
-        self.inumber = inumber
-        self.type = 'file'
-        self.size = 0
-        self.blocks = []
-        self.permissions = 0o644
-        self.links = 1
+[_code/07/07_10_inode.c](_code/07/07_10_inode.c)
+
+```c
+#include <stdio.h>
+
+typedef struct {
+    int inumber;
+    char type;
+    int size;
+    int blocks[15];
+    short permissions;
+    int links;
+} Inode;
+
+int main() {
+    printf("=== i-node Structure ===\n\n");
+    
+    printf("Inode structure:\n");
+    printf("  int inumber;           // Inode number\n");
+    printf("  char type;             // File type\n");
+    printf("  int size;              // Size in bytes\n");
+    printf("  int blocks[15];       // Direct block pointers\n");
+    printf("  short permissions;     // Access permissions\n");
+    printf("  int links;             // Hard link count\n\n");
+    
+    printf("Directory structure:\n");
+    printf("  +--------+--------------------+\n");
+    printf("  | Name   | i-node pointer     |\n");
+    printf("  +--------+--------------------+\n");
+    printf("  | \".\"    | -> This directory  |\n");
+    printf("  | \"..\"   | -> Parent directory|\n");
+    printf("  +--------+--------------------+\n");
+    
+    return 0;
+}
 ```
 
 **目錄結構**
@@ -629,56 +672,73 @@ class Inode:
 
 FAT（File Allocation Table）使用表格追蹤叢集使用情況：
 
-```python
-class FAT32:
-    """簡化的 FAT32 檔案系統"""
+[_code/07/07_11_fat32.c](_code/07/07_11_fat32.c)
+
+```c
+#include <stdio.h>
+
+#define FAT_FREE 0
+#define FAT_EOF 0xFFFFFFFF
+
+typedef struct {
+    unsigned int* fat;
+    int fat_size;
+} FAT;
+
+int main() {
+    printf("=== FAT32 File System ===\n\n");
     
-    def __init__(self, size):
-        self.fat = [0] * (size // 512)
-        self.root_dir = {}
+    printf("FAT structure:\n");
+    printf("  Each entry = 32 bits (4 bytes)\n");
+    printf("  FAT[0] = Reserved\n");
+    printf("  FAT[1] = Reserved\n");
+    printf("  FAT[2..n] = Cluster status\n\n");
     
-    def allocate_cluster(self):
-        for i, entry in enumerate(self.fat):
-            if entry == 0:
-                self.fat[i] = 0xFFFFFFFF
-                return i
-        return -1
+    printf("Cluster values:\n");
+    printf("  0x00000000 = Free cluster\n");
+    printf("  0xFFFFFFFF = EOF marker\n");
+    printf("  0x0000000x = Next cluster in chain\n\n");
     
-    def write_file(self, filename, data):
-        clusters_needed = (len(data) + 511) // 512
-        chain = []
-        
-        for _ in range(clusters_needed):
-            cluster = self.allocate_cluster()
-            if cluster == -1:
-                break
-            chain.append(cluster)
-        
-        self.root_dir[filename] = {'chain': chain, 'size': len(data)}
-        print(f"檔案 {filename} 使用叢集: {chain}")
+    printf("Example: File with 3 clusters\n");
+    printf("  Cluster chain: 5 -> 12 -> 23 -> EOF\n");
+    printf("  FAT[5] = 12\n");
+    printf("  FAT[12] = 23\n");
+    printf("  FAT[23] = 0xFFFFFFFF\n");
+    
+    return 0;
+}
 ```
 
 ### 7.5.5 檔案系統操作
 
-```python
-import os
+[_code/07/07_12_file_operations.c](_code/07/07_12_file_operations.c)
 
-def file_operations():
-    os.makedirs('test_dir/sub_dir', exist_ok=True)
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main() {
+    printf("=== File System Operations ===\n\n");
     
-    with open('test_dir/file.txt', 'w') as f:
-        f.write('Hello, File System!')
+    printf("Common POSIX operations:\n");
+    printf("  mkdir(\"dir\", 0755);     // Create directory\n");
+    printf("  rmdir(\"dir\");           // Remove directory\n");
+    printf("  fopen(\"file\", \"r\");   // Open file\n");
+    printf("  stat(\"file\", &st);     // Get metadata\n");
+    printf("  unlink(\"file\");         // Remove file\n\n");
     
-    with open('test_dir/file.txt', 'r') as f:
-        content = f.read()
-        print(content)
+    printf("Example in C:\n");
+    printf("  FILE* f = fopen(\"test.txt\", \"w\");\n");
+    printf("  fputs(\"Hello\", f);\n");
+    printf("  fclose(f);\n\n");
     
-    print(os.listdir('test_dir'))
+    printf("struct stat fields:\n");
+    printf("  st_size  - File size\n");
+    printf("  st_mtime - Modification time\n");
+    printf("  st_uid   - Owner UID\n");
+    printf("  st_gid   - Owner GID\n");
     
-    stat = os.stat('test_dir/file.txt')
-    print(f"大小: {stat.st_size}, 修改時間: {stat.st_mtime}")
-    
-    os.remove('test_dir/file.txt')
-    os.rmdir('test_dir/sub_dir')
-    os.rmdir('test_dir')
+    return 0;
+}
 ```

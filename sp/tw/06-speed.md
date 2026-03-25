@@ -140,76 +140,219 @@ int main() {
 
 **公共子表達式消除（CSE）**
 
-```python
-def cse_elimination(ir):
-    """公共子表達式消除"""
-    seen = {}      # 表達式 → 臨時變數
-    result = []
+[_code/06/06_07_cse_elimination.c](_code/06/06_07_cse_elimination.c)
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_EXPR 100
+#define MAX_LINE 256
+
+typedef struct {
+    char lhs[32];
+    char rhs[64];
+} Instruction;
+
+int main() {
+    Instruction ir[] = {
+        {"a", "b + c"},
+        {"d", "b + c + 1"},
+        {"e", "a + d"}
+    };
+    int n = 3;
     
-    for instr in ir:
-        if '=' in instr:
-            parts = instr.split('=')
-            lhs = parts[0].strip()
-            rhs = parts[1].strip()
-            
-            # 檢查是否為公共子表達式
-            if rhs in seen:
-                # 使用已計算的值
-                result.append(f"{lhs} = {seen[rhs]}")
-            else:
-                result.append(instr)
-                # 記錄此表達式
-                if lhs.startswith('t'):  # 只記錄臨時變數
-                    seen[rhs] = lhs
-        else:
-            result.append(instr)
+    char seen_exprs[MAX_EXPR][64];
+    char seen_vars[MAX_EXPR][32];
+    int seen_count = 0;
     
-    return result
+    printf("=== Common Subexpression Elimination ===\n\n");
+    printf("Original IR:\n");
+    for (int i = 0; i < n; i++) {
+        printf("  %s = %s\n", ir[i].lhs, ir[i].rhs);
+    }
+    
+    printf("\nOptimized IR:\n");
+    for (int i = 0; i < n; i++) {
+        int found = -1;
+        for (int j = 0; j < seen_count; j++) {
+            if (strcmp(ir[i].rhs, seen_exprs[j]) == 0) {
+                found = j;
+                break;
+            }
+        }
+        
+        if (found >= 0) {
+            printf("  %s = %s  // CSE: reused temp var\n", ir[i].lhs, seen_vars[found]);
+        } else {
+            printf("  %s = %s\n", ir[i].lhs, ir[i].rhs);
+            if (ir[i].lhs[0] == 't') {
+                strcpy(seen_exprs[seen_count], ir[i].rhs);
+                strcpy(seen_vars[seen_count], ir[i].lhs);
+                seen_count++;
+            }
+        }
+    }
+    
+    printf("\nData structures:\n");
+    printf("  seen_exprs[]: tracks computed expressions\n");
+    printf("  seen_vars[]: maps expression -> temp variable\n");
+    
+    return 0;
+}
 ```
 
 **死碼消除（Dead Code Elimination）**
 
-```python
-def dead_code_elimination(ir):
-    """死碼消除：移除不會影響程式結果的程式碼"""
+[_code/06/06_08_dead_code_elimination.c](_code/06/06_08_dead_code_elimination.c)
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char var[32];
+    int used;
+} VarInfo;
+
+typedef struct {
+    char lhs[32];
+    char rhs[64];
+} Instruction;
+
+int is_live(Instruction instr, VarInfo vars[], int n) {
+    if (strstr(instr.rhs, "return") != NULL) return 1;
+    if (strstr(instr.lhs, "printf") != NULL) return 0;
+    return vars[0].used > 0;
+}
+
+int main() {
+    Instruction ir[] = {
+        {"x", "10"},
+        {"y", "x + 5"},
+        {"z", "100"},
+        {"unused", "x + y"},
+        {"result", "y + z"}
+    };
+    int n = 5;
     
-    # 建立使用集合
-    used = set()
+    VarInfo vars[] = {
+        {"x", 1}, {"y", 1}, {"z", 1}, {"unused", 0}, {"result", 1}
+    };
     
-    for instr in ir:
-        if 'return' in instr:
-            # 找出return語句使用的變數
-            pass
+    printf("=== Dead Code Elimination ===\n\n");
+    printf("Original IR:\n");
+    for (int i = 0; i < n; i++) {
+        printf("  %s = %s\n", ir[i].lhs, ir[i].rhs);
+    }
     
-    # 移除從未使用的賦值
-    return [instr for instr in ir if not is_dead(instr, used)]
+    printf("\nLive variables:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("  %s: %s\n", vars[i].var, vars[i].used ? "live" : "dead");
+    }
+    
+    printf("\nOptimized IR (dead code removed):\n");
+    for (int i = 0; i < n; i++) {
+        int live = 0;
+        for (int j = 0; j < 5; j++) {
+            if (strcmp(ir[i].lhs, vars[j].var) == 0 && vars[j].used) {
+                live = 1;
+                break;
+            }
+        }
+        if (live) {
+            printf("  %s = %s\n", ir[i].lhs, ir[i].rhs);
+        } else {
+            printf("  // REMOVED: %s = %s (dead code)\n", ir[i].lhs, ir[i].rhs);
+        }
+    }
+    
+    printf("\nAlgorithm:\n");
+    printf("  1. Compute liveness of each variable\n");
+    printf("  2. Mark assignments to dead variables\n");
+    printf("  3. Remove dead assignments\n");
+    
+    return 0;
+}
 ```
 
 ### 6.1.5 剖面導向最佳化（Profile-Guided Optimization）
 
 利用程式執行資訊引導最佳化：
 
-```python
-class PGO:
-    """剖面導向最佳化"""
+[_code/06/06_09_pgo.c](_code/06/06_09_pgo.c)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int block_id;
+    int execution_count;
+} BlockProfile;
+
+typedef struct {
+    int from_block;
+    int to_block;
+    int taken_count;
+    int total_count;
+} BranchProfile;
+
+void instrument_program(BlockProfile blocks[], int n) {
+    printf("Instrumentation: Inserting counter code at block entries\n");
+    for (int i = 0; i < n; i++) {
+        blocks[i].block_id = i;
+        blocks[i].execution_count = 0;
+        printf("  Block %d: __counter_block_%d++\n", i, i);
+    }
+}
+
+void collect_profile(BlockProfile blocks[], BranchProfile branches[], int nb, int nbr) {
+    printf("\nProfile Collection: Running instrumented program\n");
+    printf("Simulated execution counts:\n");
+    for (int i = 0; i < nb; i++) {
+        blocks[i].execution_count = rand() % 1000 + 100;
+        printf("  Block %d: %d executions\n", blocks[i].block_id, blocks[i].execution_count);
+    }
+}
+
+void apply_optimizations(BlockProfile blocks[], BranchProfile branches[], int nb) {
+    printf("\nApplying Profile-Guided Optimizations:\n");
+    for (int i = 0; i < nb; i++) {
+        if (blocks[i].execution_count > 500) {
+            printf("  Block %d: HOT - inline, optimize aggressively\n", i);
+        } else {
+            printf("  Block %d: COLD - minimal optimization\n", i);
+        }
+    }
+}
+
+int main() {
+    int num_blocks = 5;
+    int num_branches = 4;
     
-    def __init__(self):
-        self.execution_counts = {}  # 基本區塊執行次數
-        self.branch_probs = {}      # 分支機率
+    BlockProfile* blocks = calloc(num_blocks, sizeof(BlockProfile));
+    BranchProfile* branches = calloc(num_branches, sizeof(BranchProfile));
     
-    def instrument(self, program):
-        """插入檢測碼"""
-        # 在每個區塊前插入計數
-        
-    def collect_profile(self):
-        """收集剖面資料"""
-        # 執行檢測過的程式
-        
-    def apply_optimizations(self, program):
-        """根據剖面應用最佳化"""
-        # 內聯熱路徑
-        # 將執行次數多的區塊最佳化
-        # 分支預測最佳化
+    printf("=== Profile-Guided Optimization (PGO) ===\n\n");
+    
+    instrument_program(blocks, num_blocks);
+    collect_profile(blocks, branches, num_blocks, num_branches);
+    apply_optimizations(blocks, branches, num_blocks);
+    
+    printf("\nPGO Phases:\n");
+    printf("  1. Instrumentation: Insert counters\n");
+    printf("  2. Training run: Collect execution profiles\n");
+    printf("  3. Profile data: Guide optimization decisions\n");
+    printf("  4. Recompile: Apply profile-informed optimizations\n");
+    
+    free(blocks);
+    free(branches);
+    
+    return 0;
+}
 ```
 
 ## 6.2 資料流分析
@@ -238,28 +381,73 @@ class PGO:
 
 半格提供了一個優雅的數學框架來描述資料流值的集合結構：
 
-```python
-class SemiLattice:
-    """
-    半格：一個偏序集合，其中每對元素都有最小上界（Join）和最大下界（Meet）
+[_code/06/06_10_semi_lattice.c](_code/06/06_10_semi_lattice.c)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int value;
+} LatticeElement;
+
+typedef struct {
+    LatticeElement* elements;
+    int size;
+    LatticeElement top;
+    LatticeElement bottom;
+} SemiLattice;
+
+LatticeElement meet(LatticeElement a, LatticeElement b) {
+    LatticeElement result;
+    result.value = (a.value < b.value) ? a.value : b.value;
+    return result;
+}
+
+LatticeElement join(LatticeElement a, LatticeElement b) {
+    LatticeElement result;
+    result.value = (a.value > b.value) ? a.value : b.value;
+    return result;
+}
+
+int is_leq(LatticeElement a, LatticeElement b) {
+    return a.value <= b.value;
+}
+
+void print_lattice_info() {
+    printf("=== Semi-Lattice Properties ===\n\n");
+    printf("A semi-lattice is a partially ordered set where:\n");
+    printf("  - Every pair has a Greatest Lower Bound (meet)\n");
+    printf("  - Every pair has a Least Upper Bound (join)\n\n");
     
-    形式定義：
-    - 封閉性：(D, ∧) 和 (D, ∨) 都是封閉的
-    - 交換律：A ∧ B = B ∧ A
-    - 結合律：(A ∧ B) ∧ C = A ∧ (B ∧ C)
-    - 冪等律：A ∧ A = A
-    """
+    printf("For Dataflow Analysis:\n");
+    printf("  - IN set = meet of all predecessors' OUT sets\n");
+    printf("  - OUT set = gen U (IN - kill)\n\n");
     
-    def __init__(self, elements, meet_op, join_op, top, bottom):
-        self.elements = elements
-        self.meet = meet_op      # 最大下界（Meet）
-        self.join = join_op      # 最小上界（Join）
-        self.top = top           # 頂元素（所有其他元素的上界）
-        self.bottom = bottom     # 底元素（所有其他元素的下界）
+    LatticeElement a = {5}, b = {10}, c = {15};
+    printf("Example with lattice elements {5, 10, 15}:\n");
     
-    def is_leq(self, a, b):
-        """偏序關係：A ≤ B 當且僅當 A ∧ B = A"""
-        return self.meet(a, b) == a
+    LatticeElement m = meet(a, c);
+    printf("  meet(5, 15) = %d\n", m.value);
+    
+    LatticeElement j = join(a, c);
+    printf("  join(5, 15) = %d\n", j.value);
+    
+    printf("\nPartial order: 5 <= 10 <= 15\n");
+    printf("  is_leq(5, 10) = %d (true)\n", is_leq(a, b));
+    printf("  is_leq(10, 5) = %d (false)\n", is_leq(b, a));
+}
+
+int main() {
+    print_lattice_info();
+    
+    printf("\nApplication in Dataflow Analysis:\n");
+    printf("  Reaching definitions: set union lattice\n");
+    printf("  Available expressions: set intersection lattice\n");
+    printf("  Constant propagation: constant lattice with TOP=UNINIT\n");
+    
+    return 0;
+}
 ```
 
 **資料流方程**
@@ -298,66 +486,221 @@ GEN[B]：區塊 B 產生的定義
 KILL[B]：區塊 B 殺死的定義（對同一變數的其他定義）
 ```
 
-```python
-def compute_gen_kill(block):
-    """計算區塊的 GEN 和 KILL 集合"""
-    gen = set()
-    kill = set()
-    defined_vars = set()
+[_code/06/06_11_gen_kill.c](_code/06/06_11_gen_kill.c)
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_VARS 50
+#define MAX_DEFS 100
+
+typedef struct {
+    char var[32];
+    char expr[64];
+    int killed;
+} Statement;
+
+typedef struct {
+    int gen[MAX_DEFS];
+    int gen_count;
+    int kill[MAX_DEFS];
+    int kill_count;
+} GenKill;
+
+void compute_gen_kill(Statement stmts[], int n, GenKill* result, int all_defs[][2], int def_count) {
+    result->gen_count = 0;
+    result->kill_count = 0;
     
-    for stmt in block.statements:
-        if isinstance(stmt, Assignment):
-            var = stmt.variable
-            defined = f"{var}={stmt.rhs}"
-            
-            # GEN：此定義本身
-            gen.add(defined)
-            
-            # KILL：同一變數的所有其他定義
-            for d in defined_vars:
-                kill.add(d)
-            
-            defined_vars.add(defined)
+    printf("Computing GEN and KILL sets:\n\n");
     
-    return gen, kill
+    for (int i = 0; i < n; i++) {
+        char def[64];
+        sprintf(def, "%s=%s", stmts[i].var, stmts[i].expr);
+        
+        result->gen[result->gen_count++] = i;
+        printf("  GEN[%d]: %s (adds definition)\n", i, def);
+        
+        for (int j = 0; j < def_count; j++) {
+            if (all_defs[j][0] == i) continue;
+            if (strcmp(stmts[i].var, stmts[all_defs[j][0]].var) == 0) {
+                result->kill[result->kill_count++] = all_defs[j][1];
+                printf("  KILL[%d]: kills definition %d\n", i, all_defs[j][1]);
+            }
+        }
+    }
+}
+
+int main() {
+    Statement stmts[] = {
+        {"a", "10", 0},
+        {"b", "a + 5", 0},
+        {"a", "20", 0},
+        {"c", "a + b", 0}
+    };
+    int n = 4;
+    
+    int all_defs[][2] = {
+        {0, 0}, {1, 1}, {2, 2}, {3, 3}
+    };
+    int def_count = 4;
+    
+    GenKill result;
+    
+    printf("=== GEN and KILL Sets ===\n\n");
+    printf("Statements:\n");
+    for (int i = 0; i < n; i++) {
+        printf("  [%d] %s = %s\n", i, stmts[i].var, stmts[i].expr);
+    }
+    
+    compute_gen_kill(stmts, n, &result, all_defs, def_count);
+    
+    printf("\nResult:\n");
+    printf("  GEN: {");
+    for (int i = 0; i < result.gen_count; i++) {
+        printf("%d%s", result.gen[i], i < result.gen_count - 1 ? ", " : "");
+    }
+    printf("}\n");
+    printf("  KILL: {");
+    for (int i = 0; i < result.kill_count; i++) {
+        printf("%d%s", result.kill[i], i < result.kill_count - 1 ? ", " : "");
+    }
+    printf("}\n");
+    
+    return 0;
+}
 ```
 
 **迭代演算法**
 
-```python
-def reaching_definitions_analysis(cfg):
-    """
-    可達定義分析 - 迭代求解
+[_code/06/06_12_reaching_definitions.c](_code/06/06_12_reaching_definitions.c)
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_BLOCKS 10
+#define MAX_DEFS 20
+
+typedef struct {
+    int id;
+    int gen[MAX_DEFS];
+    int gen_count;
+    int kill[MAX_DEFS];
+    int kill_count;
+    int pred[MAX_BLOCKS];
+    int pred_count;
+    int out[MAX_DEFS];
+    int out_count;
+} Block;
+
+void reaching_definitions_analysis(Block blocks[], int n) {
+    printf("=== Reaching Definitions Analysis ===\n\n");
     
-    資料流方程式：
-    IN[B] = ⋃_{P ∈ pred(B)} OUT[P]
-    OUT[B] = GEN[B] ∪ (IN[B] - KILL[B])
-    """
+    for (int i = 0; i < n; i++) {
+        blocks[i].out_count = 0;
+    }
     
-    # 初始化：所有 OUT 為空集合
-    out = {block: set() for block in cfg.blocks}
+    int changed = 1;
+    int iteration = 0;
     
-    changed = True
-    iterations = 0
-    
-    while changed and iterations < 100:
-        changed = False
-        iterations += 1
+    while (changed && iteration < 100) {
+        changed = 0;
+        iteration++;
         
-        for block in cfg.blocks:
-            # IN[B] = ⋃ OUT[前驅]
-            in_set = set()
-            for pred in block.predecessors:
-                in_set |= out.get(pred, set())
+        printf("Iteration %d:\n", iteration);
+        
+        for (int i = 0; i < n; i++) {
+            int new_out[MAX_DEFS];
+            int new_count = 0;
             
-            # OUT[B] = GEN[B] ∪ (IN[B] - KILL[B])
-            new_out = block.gen | (in_set - block.kill)
+            for (int p = 0; p < blocks[i].pred_count; p++) {
+                int pred_id = blocks[i].pred[p];
+                for (int k = 0; k < blocks[pred_id].out_count; k++) {
+                    new_out[new_count++] = blocks[pred_id].out[k];
+                }
+            }
             
-            if new_out != out[block]:
-                out[block] = new_out
-                changed = True
+            int temp[MAX_DEFS];
+            int temp_count = 0;
+            for (int k = 0; k < new_count; k++) {
+                int def = new_out[k];
+                int killed = 0;
+                for (int j = 0; j < blocks[i].kill_count; j++) {
+                    if (blocks[i].kill[j] == def) {
+                        killed = 1;
+                        break;
+                    }
+                }
+                if (!killed) {
+                    temp[temp_count++] = def;
+                }
+            }
+            
+            for (int j = 0; j < blocks[i].gen_count; j++) {
+                temp[temp_count++] = blocks[i].gen[j];
+            }
+            
+            if (temp_count != blocks[i].out_count ||
+                memcmp(temp, blocks[i].out, temp_count * sizeof(int)) != 0) {
+                changed = 1;
+                blocks[i].out_count = temp_count;
+                memcpy(blocks[i].out, temp, temp_count * sizeof(int));
+            }
+            
+            printf("  Block %d: OUT = {", i);
+            for (int k = 0; k < blocks[i].out_count; k++) {
+                printf("%d%s", blocks[i].out[k], k < blocks[i].out_count - 1 ? ", " : "");
+            }
+            printf("}\n");
+        }
+    }
     
-    return out, iterations
+    printf("\nConverged after %d iterations\n", iteration);
+}
+
+int main() {
+    Block blocks[3];
+    
+    blocks[0].id = 0;
+    blocks[0].gen[0] = 0;
+    blocks[0].gen_count = 1;
+    blocks[0].kill[0] = 2;
+    blocks[0].kill_count = 1;
+    blocks[0].pred_count = 0;
+    
+    blocks[1].id = 1;
+    blocks[1].gen[0] = 1;
+    blocks[1].gen_count = 1;
+    blocks[1].kill[0] = 0;
+    blocks[1].kill_count = 1;
+    blocks[1].pred[0] = 0;
+    blocks[1].pred_count = 1;
+    
+    blocks[2].id = 2;
+    blocks[2].gen[0] = 2;
+    blocks[2].gen_count = 1;
+    blocks[2].kill[0] = 0;
+    blocks[2].kill_count = 1;
+    blocks[2].pred[0] = 0;
+    blocks[2].pred[1] = 1;
+    blocks[2].pred_count = 2;
+    
+    printf("CFG:\n");
+    printf("  Block 0: a = 10  (gen: {0}, kill: {2})\n");
+    printf("  Block 1: a = 20  (gen: {1}, kill: {0})\n");
+    printf("  Block 2: b = a   (gen: {2}, kill: {0})\n\n");
+    
+    reaching_definitions_analysis(blocks, 3);
+    
+    printf("\nDataflow Equations:\n");
+    printf("  IN[B] = union of OUT[P] for all predecessors P\n");
+    printf("  OUT[B] = GEN[B] union (IN[B] - KILL[B])\n");
+    
+    return 0;
+}
 ```
 
 ### 6.2.3 可用表達式分析（Available Expressions Analysis）
@@ -395,70 +738,174 @@ OUT[B] = GEN[B] ∪ (IN[B] - KILL[B])
 
 **應用：暫存器配置**
 
-```python
-def liveness_analysis(cfg):
-    """
-    活躍性分析
-    
-    OUT[B] = ⋃_{S ∈ succ(B)} IN[S]
-    IN[B] = USE[B] ∪ (OUT[B] - DEF[B])
-    
-    其中：
-    - USE[B]：區塊中使用但未在區塊內定義的變數
-    - DEF[B]：區塊內定義的變數
-    """
-    
-    in_vars = {block: set() for block in cfg.blocks}
-    out_vars = {block: set() for block in cfg.blocks}
-    
-    changed = True
-    iterations = 0
-    
-    while changed and iterations < 100:
-        changed = False
-        iterations += 1
-        
-        # 反向迭代（從後往前）
-        for block in reversed(cfg.blocks):
-            # OUT[B] = ⋃ IN[後繼]
-            out_new = set()
-            for succ in block.successors:
-                out_new |= in_vars.get(succ, set())
-            
-            # IN[B] = USE[B] ∪ (OUT[B] - DEF[B])
-            in_new = block.use | (out_new - block.def_vars)
-            
-            if in_new != in_vars.get(block, set()):
-                in_vars[block] = in_new
-                changed = True
-            if out_new != out_vars.get(block, set()):
-                out_vars[block] = out_new
-                changed = True
-    
-    return in_vars, out_vars
+[_code/06/06_13_liveness.c](_code/06/06_13_liveness.c)
 
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-def register_allocation(cfg, in_vars):
-    """基於活躍性分析的簡單暫存器配置"""
+#define MAX_BLOCKS 10
+#define MAX_VARS 20
+
+typedef struct {
+    int id;
+    int use[MAX_VARS];
+    int use_count;
+    int def[MAX_VARS];
+    int def_count;
+    int succ[MAX_BLOCKS];
+    int succ_count;
+    int in[MAX_VARS];
+    int in_count;
+    int out[MAX_VARS];
+    int out_count;
+} Block;
+
+void print_set(char* name, int set[], int count) {
+    printf("%s = {", name);
+    for (int i = 0; i < count; i++) {
+        printf("%c%s", 'a' + set[i], i < count - 1 ? ", " : "");
+    }
+    printf("}\n");
+}
+
+void liveness_analysis(Block blocks[], int n) {
+    printf("=== Liveness Analysis ===\n\n");
     
-    # 干涉圖：若兩個變數同時活躍，則它們干涉
-    interferences = {}
+    for (int i = 0; i < n; i++) {
+        blocks[i].in_count = 0;
+        blocks[i].out_count = 0;
+    }
     
-    for block in cfg.blocks:
-        live = in_vars.get(block, set()).copy()
+    int changed = 1;
+    int iteration = 0;
+    
+    while (changed && iteration < 100) {
+        changed = 0;
+        iteration++;
         
-        for stmt in reversed(block.statements):
-            # stmt.def 中的變數與 live 中的變數干涉
-            for v in stmt.def:
-                for u in live:
-                    if v != u:
-                        add_interference(interferences, v, u)
+        printf("Iteration %d:\n", iteration);
+        
+        for (int i = n - 1; i >= 0; i--) {
+            int new_out[MAX_VARS] = {0};
+            int new_out_count = 0;
             
-            # 更新活躍集合：加入 stmt.use，移除 stmt.def
-            live = live | stmt.use - stmt.def
+            for (int s = 0; s < blocks[i].succ_count; s++) {
+                int succ_id = blocks[i].succ[s];
+                for (int k = 0; k < blocks[succ_id].in_count; k++) {
+                    int var = blocks[succ_id].in[k];
+                    int already = 0;
+                    for (int j = 0; j < new_out_count; j++) {
+                        if (new_out[j] == var) {
+                            already = 1;
+                            break;
+                        }
+                    }
+                    if (!already) {
+                        new_out[new_out_count++] = var;
+                    }
+                }
+            }
+            
+            int new_in[MAX_VARS];
+            int new_in_count = 0;
+            
+            for (int k = 0; k < new_out_count; k++) {
+                new_in[new_in_count++] = new_out[k];
+            }
+            for (int k = 0; k < blocks[i].use_count; k++) {
+                int var = blocks[i].use[k];
+                int already = 0;
+                for (int j = 0; j < new_in_count; j++) {
+                    if (new_in[j] == var) {
+                        already = 1;
+                        break;
+                    }
+                }
+                if (!already) {
+                    new_in[new_in_count++] = var;
+                }
+            }
+            
+            for (int k = 0; k < blocks[i].def_count; k++) {
+                int var = blocks[i].def[k];
+                int new_in_temp[MAX_VARS];
+                int new_in_temp_count = 0;
+                for (int j = 0; j < new_in_count; j++) {
+                    if (new_in[j] != var) {
+                        new_in_temp[new_in_temp_count++] = new_in[j];
+                    }
+                }
+                memcpy(new_in, new_in_temp, sizeof(int) * new_in_temp_count);
+                new_in_count = new_in_temp_count;
+            }
+            
+            if (new_out_count != blocks[i].out_count ||
+                memcmp(new_out, blocks[i].out, new_out_count * sizeof(int)) != 0) {
+                changed = 1;
+                blocks[i].out_count = new_out_count;
+                memcpy(blocks[i].out, new_out, new_out_count * sizeof(int));
+            }
+            
+            if (new_in_count != blocks[i].in_count ||
+                memcmp(new_in, blocks[i].in, new_in_count * sizeof(int)) != 0) {
+                changed = 1;
+                blocks[i].in_count = new_in_count;
+                memcpy(blocks[i].in, new_in, new_in_count * sizeof(int));
+            }
+            
+            printf("  Block %d: ", i);
+            print_set("IN", blocks[i].in, blocks[i].in_count);
+            printf("          ");
+            print_set("OUT", blocks[i].out, blocks[i].out_count);
+        }
+    }
     
-    # 使用圖著色分配暫存器
-    return graph_coloring(interferences, num_registers=8)
+    printf("\nConverged after %d iterations\n", iteration);
+}
+
+int main() {
+    Block blocks[3];
+    
+    blocks[0].id = 0;
+    blocks[0].use[0] = 0;
+    blocks[0].use_count = 1;
+    blocks[0].def[0] = 0;
+    blocks[0].def_count = 1;
+    blocks[0].succ[0] = 1;
+    blocks[0].succ_count = 1;
+    
+    blocks[1].id = 1;
+    blocks[1].use[0] = 0;
+    blocks[1].use[1] = 1;
+    blocks[1].use_count = 2;
+    blocks[1].def[0] = 1;
+    blocks[1].def_count = 1;
+    blocks[1].succ[0] = 2;
+    blocks[1].succ_count = 1;
+    
+    blocks[2].id = 2;
+    blocks[2].use[0] = 0;
+    blocks[2].use[1] = 1;
+    blocks[2].use_count = 2;
+    blocks[2].def[0] = 2;
+    blocks[2].def_count = 1;
+    blocks[2].succ_count = 0;
+    
+    printf("CFG:\n");
+    printf("  Block 0: b = a    (use: {a}, def: {b})\n");
+    printf("  Block 1: c = a + b (use: {a,b}, def: {c})\n");
+    printf("  Block 2: d = a + c (use: {a,c}, def: {d})\n\n");
+    
+    liveness_analysis(blocks, 3);
+    
+    printf("\nDataflow Equations:\n");
+    printf("  OUT[B] = union of IN[S] for all successors S\n");
+    printf("  IN[B] = USE[B] union (OUT[B] - DEF[B])\n");
+    
+    return 0;
+}
 ```
 
 ### 6.2.5 別名分析（Alias Analysis）
@@ -567,48 +1014,142 @@ int main() {
 
 專注於單一基本區塊內的排程：
 
-```python
-def local_scheduling(block, issue_width=2):
-    """
-    區域性排程 - 簡化版
+[_code/06/06_14_local_scheduling.c](_code/06/06_14_local_scheduling.c)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_NODES 20
+#define MAX_EDGES 40
+
+typedef struct {
+    int id;
+    int depth;
+    int scheduled;
+} Node;
+
+typedef struct {
+    int from;
+    int to;
+} Edge;
+
+int has_all_preds_scheduled(Node nodes[], int node_id, Edge edges[], int edge_count, int scheduled_count) {
+    for (int i = 0; i < edge_count; i++) {
+        if (edges[i].to == node_id) {
+            int pred_scheduled = 0;
+            for (int j = 0; j < scheduled_count; j++) {
+                if (nodes[j].id == edges[i].from) {
+                    pred_scheduled = 1;
+                    break;
+                }
+            }
+            if (!pred_scheduled) return 0;
+        }
+    }
+    return 1;
+}
+
+int compute_depth(Node nodes[], int node_id, Edge edges[], int edge_count, Node result_nodes[]) {
+    int max_pred_depth = -1;
     
-    問題：給定一個區塊的 DAG，儘可能在每個時鐘發射 issue_width 條指令
-    """
+    for (int i = 0; i < edge_count; i++) {
+        if (edges[i].to == node_id) {
+            for (int j = 0; j < MAX_NODES; j++) {
+                if (result_nodes[j].id == edges[i].from) {
+                    if (result_nodes[j].depth > max_pred_depth) {
+                        max_pred_depth = result_nodes[j].depth;
+                    }
+                    break;
+                }
+            }
+        }
+    }
     
-    # 建構依賴圖（DAG）
-    dag = build_dag(block)
+    if (max_pred_depth < 0) return 0;
+    return max_pred_depth + 1;
+}
+
+void local_scheduling(Node nodes[], int n, Edge edges[], int e, int issue_width) {
+    printf("=== Local Scheduling (Issue Width = %d) ===\n\n", issue_width);
     
-    # 計算每個節點的深度（關鍵路徑長度）
-    depths = compute_depths(dag)
+    Node result_nodes[MAX_NODES];
+    int result_count = 0;
     
-    # 按深度排序
-    sorted_nodes = sorted(dag.nodes, key=lambda n: -depths[n])
+    for (int i = 0; i < n; i++) {
+        result_nodes[i].id = nodes[i].id;
+        result_nodes[i].depth = 0;
+        result_nodes[i].scheduled = 0;
+    }
     
-    scheduled = []
-    clock = 0
+    for (int i = 0; i < n; i++) {
+        result_nodes[i].depth = compute_depth(result_nodes, nodes[i].id, edges, e, result_nodes);
+    }
     
-    while sorted_nodes:
-        # 選擇可發射且深度最大的指令
-        available = [
-            n for n in sorted_nodes
-            if all(pred in scheduled for pred in dag.preds[n])
-            and dag.issue_time[n] <= clock
-        ]
+    printf("Node depths (critical path lengths):\n");
+    for (int i = 0; i < n; i++) {
+        printf("  Node %c: depth = %d\n", 'A' + result_nodes[i].id, result_nodes[i].depth);
+    }
+    
+    printf("\nScheduling:\n");
+    int clock = 0;
+    
+    while (result_count < n) {
+        Node ready[MAX_NODES];
+        int ready_count = 0;
         
-        if not available:
-            clock += 1
-            continue
+        for (int i = 0; i < n; i++) {
+            if (result_nodes[i].scheduled) continue;
+            if (has_all_preds_scheduled(result_nodes, result_nodes[i].id, edges, e, result_count)) {
+                ready[ready_count++] = result_nodes[i];
+            }
+        }
         
-        # 選擇深度最大的
-        to_schedule = max(available, key=lambda n: depths[n])
+        if (ready_count == 0) {
+            printf("  Clock %d: No ready instructions (cycle detected)\n", clock);
+            break;
+        }
         
-        # 發射（最多 issue_width 條）
-        scheduled.append(to_schedule)
-        sorted_nodes.remove(to_schedule)
-        
-        clock += 1
+        for (int i = 0; i < ready_count && result_count < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (result_nodes[j].id == ready[i].id && !result_nodes[j].scheduled) {
+                    result_nodes[j].scheduled = 1;
+                    printf("  Clock %d: Execute Node %c\n", clock, 'A' + result_nodes[j].id);
+                    result_count++;
+                    break;
+                }
+            }
+        }
+        clock++;
+    }
     
-    return scheduled
+    printf("\nTotal schedule length: %d cycles\n", clock);
+}
+
+int main() {
+    Node nodes[] = {{0, 0, 0}, {1, 0, 0}, {2, 0, 0}, {3, 0, 0}};
+    int n = 4;
+    
+    Edge edges[] = {{0, 2}, {1, 2}, {2, 3}};
+    int e = 3;
+    
+    printf("DAG:\n");
+    printf("    A\n");
+    printf("   / \\\n");
+    printf("  B   C\n");
+    printf("   \\ /\n");
+    printf("    D\n\n");
+    
+    local_scheduling(nodes, n, edges, e, 2);
+    
+    printf("\nAlgorithm:\n");
+    printf("  1. Build DAG from block instructions\n");
+    printf("  2. Compute depth (critical path) for each node\n");
+    printf("  3. Sort by depth (highest first)\n");
+    printf("  4. Schedule up to issue_width instructions per cycle\n");
+    
+    return 0;
+}
 ```
 
 ### 6.3.4 迴圈展開與封裝（Loop Unrolling & Jam）
@@ -735,38 +1276,90 @@ JIT 編譯器的假設失效時，需要回退到解譯執行。
 | 類別載入 | 新類別可能影響別名分析 |
 | 斷言失敗 | assert 或 debug 檢查失敗 |
 
-```python
-class Deoptimization:
-    """去最佳化處理"""
+[_code/06/06_15_deoptimization.c](_code/06/06_15_deoptimization.c)
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef enum {
+    TYPE_ASSUMPTION_FAILED,
+    PROFILE_INVALIDATED,
+    CLASS_LOADED,
+    ASSERTION_FAILED
+} DeoptReason;
+
+typedef struct {
+    int bci;
+    DeoptReason reason;
+    void* target_address;
+} DeoptInfo;
+
+typedef struct {
+    int deopt_counts[100];
+    int unstable标记[100];
+} ProfileData;
+
+void handle_deoptimization(DeoptInfo* info, ProfileData* profile) {
+    printf("=== Deoptimization Handler ===\n\n");
     
-    def handle_deoptimization(self, reason, bci, target):
-        """
-        處理去最佳化
-        
-        1. 找到對應的解譯器框架
-        2. 複製目前的暫存器/堆疊狀態
-        3. 跳轉到解譯器
-        4. 可能重新編譯（考慮剖面失效原因）
-        """
-        
-        # 取得目前位元組碼指標
-        current_bci = get_bci_from_pc(target)
-        
-        # 取得目前堆疊框架
-        frame = get_current_frame()
-        
-        # 建立解譯器堆疊框架
-        interpreter_frame = create_interpreter_frame(frame)
-        
-        # 更新剖面資訊（考慮未來重新編譯）
-        update_profile(bci, reason)
-        
-        # 若多次去最佳化，標記為「不穩定」，降低重新編譯優先級
-        if self.deopt_counts[bci] > 3:
-            mark_as_unstable(bci)
-        
-        # 跳轉到解譯器
-        interpreter_loop(interpreter_frame)
+    const char* reason_str[] = {
+        "Type assumption failed",
+        "Profile invalidated",
+        "Class loaded",
+        "Assertion failed"
+    };
+    
+    printf("Deoptimization triggered:\n");
+    printf("  Bytecode index: %d\n", info->bci);
+    printf("  Reason: %s\n", reason_str[info->reason]);
+    printf("  Target address: %p\n", info->target_address);
+    
+    printf("\nRecovery steps:\n");
+    printf("  1. Get current interpreter frame\n");
+    printf("  2. Copy register/stack state\n");
+    printf("  3. Jump to interpreter\n");
+    printf("  4. Update profile information\n");
+    
+    profile->deopt_counts[info->bci]++;
+    
+    if (profile->deopt_counts[info->bci] > 3) {
+        printf("\n  WARNING: Deopt count > 3, marking as unstable\n");
+        printf("  Future recompilation will use more conservative assumptions\n");
+        profile->unstable标记[info->bci] = 1;
+    }
+    
+    printf("\n  Returning to interpreter loop...\n");
+}
+
+int main() {
+    ProfileData profile;
+    memset(&profile, 0, sizeof(profile));
+    
+    printf("=== JIT Deoptimization Demo ===\n\n");
+    
+    DeoptInfo info = {
+        .bci = 42,
+        .reason = TYPE_ASSUMPTION_FAILED,
+        .target_address = (void*)0x7fff0000
+    };
+    
+    printf("Scenario: Variable assumed to be int, but became long\n\n");
+    handle_deoptimization(&info, &profile);
+    
+    printf("\n=== Common Deoptimization Triggers ===\n\n");
+    printf("1. Type assumption failed\n");
+    printf("   - Assumed int, got long/string\n");
+    printf("\n2. Profile invalidated\n");
+    printf("   - Branch suddenly becomes hot\n");
+    printf("\n3. Class loaded\n");
+    printf("   - New class may affect alias analysis\n");
+    printf("\n4. Assertion failed\n");
+    printf("   - Debug check in optimized code fails\n");
+    
+    return 0;
+}
 ```
 
 ## 6.5 SIMD 與向量化的應用
@@ -945,177 +1538,390 @@ void gemm_optimized(float* A, float* B, float* C, int N) {
 
 內聯展開將函數呼叫替換為函數主體，消除呼叫開銷。
 
-```python
-def inline_function(call_site, callee):
-    """
-    內聯展開
-    
-    優點：
-    - 消除函數呼叫開銷
-    - 開啟更多最佳化機會（如跨函數 CSE）
-    
-    缺點：
-    - 增加程式大小（程式膨脹）
-    - 可能增加暫存器壓力
-    """
-    
-    # 檢查內聯條件
-    if not should_inline(call_site, callee):
-        return None
-    
-    # 複製函數主體
-    body_copy = copy_body(callee)
-    
-    # 參數替換
-    for param, arg in zip(callee.params, call_site.args):
-        body_copy = substitute(body_copy, param, arg)
-    
-    # 設定返回值的替換
-    body_copy = handle_return(body_copy, call_site.lhs)
-    
-    return body_copy
+[_code/06/06_16_inlining.c](_code/06/06_16_inlining.c)
 
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-def should_inline(call_site, callee):
-    """決定是否應該內聯"""
+typedef struct {
+    char name[32];
+    int body_size;
+    int is_leaf;
+    int is_recursive;
+    int execution_freq;
+} Function;
+
+int has_static_vars(Function* func) {
+    return 0;
+}
+
+int should_inline(Function* call_site, Function* callee) {
+    if (callee->is_recursive) {
+        printf("  NOT inlining: %s is recursive\n", callee->name);
+        return 0;
+    }
     
-    # 內聯禁忌：
-    # 1. 遞迴呼叫（直接或間接）
-    if is_recursive(callee):
-        return False
+    if (callee->body_size > 100) {
+        printf("  NOT inlining: %s body too large (%d statements)\n",
+               callee->name, callee->body_size);
+        return 0;
+    }
     
-    # 2. 函數過大
-    if len(callee.body) > 100:
-        return False
+    if (has_static_vars(callee)) {
+        printf("  NOT inlining: %s has static variables\n", callee->name);
+        return 0;
+    }
     
-    # 3. 包含可變動的靜態變數
-    if has_static_vars(callee):
-        return False
+    if (callee->is_leaf && callee->body_size < 20) {
+        printf("  Inlining: %s is small leaf function\n", callee->name);
+        return 1;
+    }
     
-    # 內聯好處：
-    # 1. 函數很小的巢狀呼叫
-    # 2. 熱路徑上的呼叫
-    # 3. 虚函數呼叫（單態內聯）
+    if (call_site->execution_freq > 1000) {
+        printf("  Inlining: %s is called frequently (%d times)\n",
+               callee->name, call_site->execution_freq);
+        return 1;
+    }
     
-    if callee.is_leaf and len(callee.body) < 20:
-        return True
+    return 0;
+}
+
+void inline_function(char* result, Function* call_site, Function* callee) {
+    printf("Inlining %s at call site %s:\n", callee->name, call_site->name);
+    printf("  1. Copy function body\n");
+    printf("  2. Substitute parameters with arguments\n");
+    printf("  3. Handle return statements\n");
+    printf("  4. Insert inlined code\n");
     
-    if call_site.execution_frequency > 1000:
-        return True
+    sprintf(result, "// Inlined %s\n%s", callee->name,
+            callee->is_leaf ? "// Leaf function - efficient\n" : "// Non-leaf function\n");
+}
+
+int main() {
+    Function square = {"square", 3, 1, 0, 0};
+    Function big_func = {"big_func", 150, 0, 0, 100};
+    Function hot_loop = {"hot_loop", 15, 1, 0, 5000};
+    Function recursive = {"factorial", 20, 1, 1, 0};
     
-    return False
+    Function caller = {"caller", 50, 0, 0, 2000};
+    
+    printf("=== Function Inlining Analysis ===\n\n");
+    
+    char result[256];
+    
+    printf("Test 1: Small leaf function\n");
+    inline_function(result, &caller, &square);
+    printf("  should_inline: %s\n\n", should_inline(&caller, &square) ? "YES" : "NO");
+    
+    printf("Test 2: Large function\n");
+    inline_function(result, &caller, &big_func);
+    printf("  should_inline: %s\n\n", should_inline(&caller, &big_func) ? "YES" : "NO");
+    
+    printf("Test 3: Hot path function\n");
+    inline_function(result, &caller, &hot_loop);
+    printf("  should_inline: %s\n\n", should_inline(&caller, &hot_loop) ? "YES" : "NO");
+    
+    printf("Test 4: Recursive function\n");
+    inline_function(result, &caller, &recursive);
+    printf("  should_inline: %s\n\n", should_inline(&caller, &recursive) ? "YES" : "NO");
+    
+    printf("Inlining Benefits:\n");
+    printf("  - Eliminates call overhead\n");
+    printf("  - Enables cross-function optimizations\n");
+    printf("  - Improves cache locality\n\n");
+    
+    printf("Inlining Costs:\n");
+    printf("  - Code bloat\n");
+    printf("  - Increased register pressure\n");
+    printf("  - Compile time increase\n");
+    
+    return 0;
+}
 ```
 
 ### 6.6.2 逃逸分析（Escape Analysis）
 
 逃逸分析確定物件是否逃離其創建的作用域。
 
-```python
-def escape_analysis(method):
-    """
-    逃逸分析
-    
-    逃逸等級：
-    - 不逃逸（No Escape）：物件僅在建立它的函數中使用
-    - 參數逃逸（Arg Escape）：作為參數傳遞
-    - 全域逃逸（Global Escape）：逃逸到全域或堆積
-    """
-    
-    # 建立物件的逃逸圖
-    escape_graph = {}
-    
-    for stmt in method.statements:
-        if isinstance(stmt, NewObject):
-            obj = stmt.object
-            escape_level = analyze_object_escape(stmt, method)
-            escape_graph[obj] = escape_level
-    
-    return escape_graph
+[_code/06/06_17_escape_analysis.c](_code/06/06_17_escape_analysis.c)
 
+```c
+#include <stdio.h>
+#include <string.h>
 
-def analyze_object_escape(stmt, method):
-    """分析單一物件的逃逸等級"""
-    
-    escape = 'local'  # 初始假設：本地
-    
-    # 分析語句使用
-    for use in stmt.uses:
-        if use.is_global:
-            return 'global'
-        if use.is_return:
-            return 'global'
-        if use.is_store_through_pointer:
-            return 'arg_escape'
-        if use.is_passed_as_argument:
-            escape = max(escape, 'arg_escape')
-    
-    return escape
+typedef enum {
+    ESCAPE_LOCAL,
+    ESCAPE_ARG,
+    ESCAPE_GLOBAL
+} EscapeLevel;
 
+typedef struct {
+    char name[32];
+    EscapeLevel level;
+} ObjectInfo;
 
-# 逃逸分析的應用：棧配置
-def stack_allocate(method, escape_graph):
-    """
-    棧配置：若物件不逃逸，可在棧上配置而非堆積
+typedef struct {
+    int is_global;
+    int is_return;
+    int is_store_through_pointer;
+    int is_passed_as_argument;
+} UseInfo;
+
+EscapeLevel analyze_object_escape(UseInfo uses[], int use_count) {
+    EscapeLevel escape = ESCAPE_LOCAL;
     
-    優點：
-    - 配置/釋放速度快
-    - 無需 GC 追蹤
-    - 提高快取友好性
-    """
+    for (int i = 0; i < use_count; i++) {
+        if (uses[i].is_global) return ESCAPE_GLOBAL;
+        if (uses[i].is_return) return ESCAPE_GLOBAL;
+        if (uses[i].is_store_through_pointer) return ESCAPE_ARG;
+        if (uses[i].is_passed_as_argument) escape = ESCAPE_ARG;
+    }
     
-    for obj, escape_level in escape_graph.items():
-        if escape_level == 'local':
-            # 可在棧上配置
-            obj.allocation = 'stack'
-        else:
-            # 必須在堆積上配置
-            obj.allocation = 'heap'
+    return escape;
+}
+
+const char* escape_level_str(EscapeLevel level) {
+    switch (level) {
+        case ESCAPE_LOCAL: return "Local (No Escape)";
+        case ESCAPE_ARG: return "Arg Escape";
+        case ESCAPE_GLOBAL: return "Global Escape";
+    }
+    return "Unknown";
+}
+
+void stack_allocate(ObjectInfo* obj, EscapeLevel level) {
+    if (level == ESCAPE_LOCAL) {
+        obj->level = ESCAPE_LOCAL;
+        printf("  %s: STACK allocation (does not escape)\n", obj->name);
+    } else {
+        obj->level = ESCAPE_GLOBAL;
+        printf("  %s: HEAP allocation (escapes)\n", obj->name);
+    }
+}
+
+int main() {
+    printf("=== Escape Analysis ===\n\n");
+    
+    ObjectInfo objects[] = {
+        {"local_obj", ESCAPE_LOCAL},
+        {"passed_obj", ESCAPE_ARG},
+        {"global_obj", ESCAPE_GLOBAL}
+    };
+    
+    printf("Escape Levels:\n");
+    printf("  1. No Escape: Object used only in creating function\n");
+    printf("  2. Arg Escape: Object passed as argument\n");
+    printf("  3. Global Escape: Object escapes to global scope or heap\n\n");
+    
+    UseInfo test_uses1[] = {{0, 0, 0, 0}};
+    UseInfo test_uses2[] = {{0, 0, 0, 1}};
+    UseInfo test_uses3[] = {{1, 0, 0, 0}};
+    
+    printf("Analysis Results:\n");
+    
+    EscapeLevel level1 = analyze_object_escape(test_uses1, 1);
+    printf("  Test object 1: %s\n", escape_level_str(level1));
+    
+    EscapeLevel level2 = analyze_object_escape(test_uses2, 1);
+    printf("  Test object 2: %s\n", escape_level_str(level2));
+    
+    EscapeLevel level3 = analyze_object_escape(test_uses3, 1);
+    printf("  Test object 3: %s\n", escape_level_str(level3));
+    
+    printf("\nStack Allocation:\n");
+    stack_allocate(&objects[0], ESCAPE_LOCAL);
+    stack_allocate(&objects[1], ESCAPE_ARG);
+    stack_allocate(&objects[2], ESCAPE_GLOBAL);
+    
+    printf("\nBenefits of Stack Allocation:\n");
+    printf("  - Faster allocation/deallocation\n");
+    printf("  - No GC needed\n");
+    printf("  - Better cache locality\n");
+    
+    return 0;
+}
 ```
 
 ### 6.6.3 鎖消除（Lock Elision）
 
 在某些情況下，鎖可以被安全地消除。
 
-```python
-def lock_elision(method):
-    """
-    鎖消除
+[_code/06/06_18_lock_elision.c](_code/06/06_18_lock_elision.c)
+
+```c
+#include <stdio.h>
+#include <stdbool.h>
+
+typedef struct {
+    char name[32];
+    bool is_thread_local;
+    bool escapes;
+} LockObject;
+
+typedef enum {
+    LOCK_ACQUIRE,
+    LOCK_RELEASE,
+    NO_LOCK
+} LockOp;
+
+void eliminate_lock(const char* lock_name) {
+    printf("  ELIMINATED: Lock on %s (thread-local object)\n", lock_name);
+}
+
+bool is_thread_local(LockObject* obj) {
+    return obj->is_thread_local;
+}
+
+bool escapes_to_other_threads(LockObject* obj) {
+    return obj->escapes;
+}
+
+void process_lock_op(LockObject* obj, LockOp op) {
+    if (op == LOCK_ACQUIRE) {
+        if (is_thread_local(obj) && !escapes_to_other_threads(obj)) {
+            eliminate_lock(obj->name);
+        } else {
+            printf("  KEEP: Lock on %s (may be accessed by multiple threads)\n", obj->name);
+        }
+    }
+}
+
+int main() {
+    printf("=== Lock Elision ===\n\n");
     
-    原理：
-    若物件只在單一執行緒中可見，則鎖是不必要的
-    """
+    LockObject local_obj = {"local_obj", true, false};
+    LockObject shared_obj = {"shared_obj", false, true};
+    LockObject escaped_obj = {"escaped_obj", true, true};
     
-    for stmt in method.statements:
-        if isinstance(stmt, LockAcquire):
-            obj = stmt.lock_object
-            
-            # 檢查物件是否為本地且不逃逸
-            if is_thread_local(obj) and not escapes_to_other_threads(obj):
-                # 鎖可以被消除
-                eliminate_lock(stmt)
+    printf("Test 1: Thread-local object\n");
+    printf("  Object: %s (thread_local=%d, escapes=%d)\n",
+           local_obj.name, local_obj.is_thread_local, local_obj.escapes);
+    process_lock_op(&local_obj, LOCK_ACQUIRE);
+    
+    printf("\nTest 2: Shared object\n");
+    printf("  Object: %s (thread_local=%d, escapes=%d)\n",
+           shared_obj.name, shared_obj.is_thread_local, shared_obj.escapes);
+    process_lock_op(&shared_obj, LOCK_ACQUIRE);
+    
+    printf("\nTest 3: Escaped object\n");
+    printf("  Object: %s (thread_local=%d, escapes=%d)\n",
+           escaped_obj.name, escaped_obj.is_thread_local, escaped_obj.escapes);
+    process_lock_op(&escaped_obj, LOCK_ACQUIRE);
+    
+    printf("\nLock Elision Principle:\n");
+    printf("  If an object is only visible to a single thread,\n");
+    printf("  locks on that object are unnecessary and can be removed.\n");
+    
+    printf("\nBenefits:\n");
+    printf("  - Eliminates lock overhead\n");
+    printf("  - Reduces contention\n");
+    printf("  - Enables more optimizations\n");
+    
+    return 0;
+}
 ```
 
 ### 6.6.4 邊界消除（Bounds Check Elimination）
 
 在某些情況下，陣列邊界檢查可以被消除。
 
-```python
-def bounds_check_elimination(method):
-    """
-    邊界檢查消除
+[_code/06/06_19_bounds_check.c](_code/06/06_19_bounds_check.c)
+
+```c
+#include <stdio.h>
+#include <stdbool.h>
+
+typedef struct {
+    int lower_bound;
+    int upper_bound;
+    bool bounds_enforced;
+} LoopInfo;
+
+typedef struct {
+    int access_min;
+    int access_max;
+    bool is_bounds_check;
+} Statement;
+
+bool bounds_are_enforced(LoopInfo* loop) {
+    return loop->bounds_enforced;
+}
+
+bool is_bounds_check(Statement* stmt) {
+    return stmt->is_bounds_check;
+}
+
+bool is_redundant_due_to_loop(LoopInfo* loop, Statement* stmt) {
+    if (!bounds_are_enforced(loop)) return false;
     
-    情況：
-    1. 靜態可確定的存取
-    2. 已驗證過的索引
-    3. 進入安全的迴圈
-    """
+    if (stmt->access_min >= loop->lower_bound &&
+        stmt->access_max <= loop->upper_bound) {
+        return true;
+    }
     
-    for loop in method.loops:
-        # 檢查迴圈是否收斂
-        if loop.bounds_are_enforced():
-            # 迴圈內的邊界檢查可能消除
-            for stmt in loop.statements:
-                if is_bounds_check(stmt):
-                    if is_redundant_due_to_loop(loop, stmt):
-                        eliminate_bounds_check(stmt)
+    return false;
+}
+
+void eliminate_bounds_check(Statement* stmt) {
+    printf("  ELIMINATED: Bounds check on [%d, %d] (redundant)\n",
+           stmt->access_min, stmt->access_max);
+}
+
+void process_loop(LoopInfo* loop, Statement stmts[], int n) {
+    printf("Loop bounds: [%d, %d], enforced: %s\n",
+           loop->lower_bound, loop->upper_bound,
+           loop->bounds_enforced ? "YES" : "NO");
+    
+    if (!bounds_are_enforced(loop)) {
+        printf("  Cannot eliminate bounds checks (bounds not enforced)\n");
+        return;
+    }
+    
+    for (int i = 0; i < n; i++) {
+        if (is_bounds_check(&stmts[i])) {
+            if (is_redundant_due_to_loop(loop, &stmts[i])) {
+                eliminate_bounds_check(&stmts[i]);
+            } else {
+                printf("  KEEP: Bounds check [%d, %d] (may exceed loop bounds)\n",
+                       stmts[i].access_min, stmts[i].access_max);
+            }
+        }
+    }
+}
+
+int main() {
+    printf("=== Bounds Check Elimination ===\n\n");
+    
+    LoopInfo safe_loop = {0, 99, true};
+    
+    Statement stmts[] = {
+        {0, 99, true},
+        {-5, 50, true},
+        {50, 150, true},
+        {10, 20, false}
+    };
+    int n = 4;
+    
+    printf("Test 1: Safe loop with enforced bounds [0, 99]\n");
+    process_loop(&safe_loop, stmts, n);
+    
+    printf("\nTest 2: Unsafe loop\n");
+    LoopInfo unsafe_loop = {0, 99, false};
+    process_loop(&unsafe_loop, stmts, n);
+    
+    printf("\nWhen Bounds Checks Can Be Eliminated:\n");
+    printf("  1. Loop bounds are statically determinable\n");
+    printf("  2. Array access provably within bounds\n");
+    printf("  3. Index already validated by previous check\n");
+    printf("  4. After range analysis proves safety\n");
+    
+    printf("\nBenefits:\n");
+    printf("  - Eliminates branch overhead\n");
+    printf("  - Enables vectorization\n");
+    printf("  - Reduces code size\n");
+    
+    return 0;
+}
 ```

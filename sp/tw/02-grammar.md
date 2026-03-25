@@ -708,67 +708,96 @@ ASTNode* parse_expr() {
 
 **PLY 範例**
 
-```python
-# 安裝: pip install ply
-from ply import yacc
+[_code/02/02_07_ply_equivalent.c](_code/02/02_07_ply_equivalent.c)
 
-# 詞法分析
-tokens = ['NUMBER', 'PLUS', 'MINUS', 'MULT', 'DIV', 'LPAREN', 'RPAREN']
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-t_PLUS    = r'\+'
-t_MINUS   = r'-'
-t_MULT    = r'\*'
-t_DIV     = r'/'
-t_LPAREN  = r'\('
-t_RPAREN  = r'\)'
-t_NUMBER  = r'\d+'
+char input[100];
+int pos = 0;
 
-def t_NUMBER(t):
-    r'\d+'
-    t.value = int(t.value)
-    return t
+void skip_whitespace() {
+    while (input[pos] == ' ' || input[pos] == '\t') pos++;
+}
 
-def t_error(t):
-    print(f"詞法錯誤: {t.value[0]}")
-    t.lexer.skip(1)
+int parse_number() {
+    skip_whitespace();
+    int result = 0;
+    while (input[pos] >= '0' && input[pos] <= '9') {
+        result = result * 10 + (input[pos] - '0');
+        pos++;
+    }
+    return result;
+}
 
-lexer = yacc.lex()
+int parse_factor() {
+    skip_whitespace();
+    if (input[pos] == '(') {
+        pos++;
+        int result = parse_expr();
+        skip_whitespace();
+        if (input[pos] == ')') pos++;
+        return result;
+    }
+    return parse_number();
+}
 
-# 語法分析
-def p_expr(p):
-    '''expr : expr PLUS expr
-            | expr MINUS expr'''
-    p[0] = ('+', p[1], p[3]) if p[2] == '+' else ('-', p[1], p[3])
+int parse_term() {
+    int result = parse_factor();
+    while (1) {
+        skip_whitespace();
+        if (input[pos] == '*') {
+            pos++;
+            int rhs = parse_factor();
+            printf("  Reduce: term -> term * factor\n");
+            result = result * rhs;
+        } else if (input[pos] == '/') {
+            pos++;
+            int rhs = parse_factor();
+            printf("  Reduce: term -> term / factor\n");
+            result = result / rhs;
+        } else break;
+    }
+    return result;
+}
 
-def p_expr_term(p):
-    'expr : term'
-    p[0] = p[1]
+int parse_expr() {
+    int result = parse_term();
+    while (1) {
+        skip_whitespace();
+        if (input[pos] == '+') {
+            pos++;
+            int rhs = parse_term();
+            printf("  Reduce: expr -> expr + expr\n");
+            result = result + rhs;
+        } else if (input[pos] == '-') {
+            pos++;
+            int rhs = parse_term();
+            printf("  Reduce: expr -> expr - expr\n");
+            result = result - rhs;
+        } else break;
+    }
+    return result;
+}
 
-def p_term(p):
-    '''term : term MULT term
-            | term DIV term'''
-    p[0] = ('*', p[1], p[3]) if p[2] == '*' else ('/', p[1], p[3])
-
-def p_term_factor(p):
-    'term : factor'
-    p[0] = p[1]
-
-def p_factor_number(p):
-    'factor : NUMBER'
-    p[0] = ('num', p[1])
-
-def p_factor_expr(p):
-    'factor : LPAREN expr RPAREN'
-    p[0] = p[2]
-
-def p_error(p):
-    print("語法錯誤!")
-
-parser = yacc.yacc()
-
-# 測試
-result = parser.parse("2 + 3 * 4")
-print(result)  # ('+', ('num', 2), ('*', ('num', 3), ('num', 4)))
+int main() {
+    printf("=== Recursive Descent Parser (C equivalent of PLY) ===\n\n");
+    
+    printf("Tokens: NUMBER, PLUS, MINUS, MULT, DIV, LPAREN, RPAREN\n");
+    printf("Grammar:\n");
+    printf("  expr   -> expr + expr | expr - expr | term\n");
+    printf("  term   -> term * factor | term / factor | factor\n");
+    printf("  factor -> NUMBER | ( expr )\n\n");
+    
+    strcpy(input, "2 + 3 * 4");
+    printf("Input: \"%s\"\n\nParsing steps:\n", input);
+    int result = parse_expr();
+    printf("\nResult: %d\n", result);
+    
+    return 0;
+}
 ```
 
 ## 2.5 語法樹與抽象語法樹

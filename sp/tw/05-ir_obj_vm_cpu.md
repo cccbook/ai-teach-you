@@ -811,14 +811,40 @@ void function(int a, int b) {
                                     硬體
 ```
 
-**Python socket 範例**
+**C socket 範例**
 
-```python
-import socket
+[_code/05/05_06_socket.c](_code/05/05_06_socket.c)
 
-# Python 封裝了 POSIX socket API
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(('127.0.0.1', 8080))
+```c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
-# 底層可能呼叫：connect() → SYS_connect → 核心
+int main() {
+    printf("=== POSIX Socket API ===\n\n");
+    
+    printf("C socket example:\n");
+    printf("  int sock = socket(AF_INET, SOCK_STREAM, 0);\n");
+    printf("  struct sockaddr_in addr = {\n");
+    printf("      .sin_family = AF_INET,\n");
+    printf("      .sin_port = htons(8080),\n");
+    printf("      .sin_addr.s_addr = inet_addr(\"127.0.0.1\")\n");
+    printf("  };\n");
+    printf("  connect(sock, (struct sockaddr*)&addr, sizeof(addr));\n\n");
+    
+    printf("Call hierarchy:\n");
+    printf("  Python: socket.connect()\n");
+    printf("     |  (wraps)\n");
+    printf("  C:     connect()\n");
+    printf("     |  (syscall)\n");
+    printf("  Kernel: sys_connect\n\n");
+    
+    printf("Language runtime provides:\n");
+    printf("  - Memory management\n");
+    printf("  - Type system\n");
+    printf("  - Standard library\n");
+    printf("  - System call abstraction\n");
+    
+    return 0;
+}
 ```

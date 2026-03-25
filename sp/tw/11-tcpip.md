@@ -624,82 +624,99 @@ int main() {
 
 每個客戶端連線由一個子行程處理：
 
-```python
-import socket
-import os
+[_code/11/11_04_multi_process_server.c](_code/11/11_04_multi_process_server.c)
 
-def handle_client(sock, addr):
-    # 在子行程中處理
-    try:
-        while True:
-            data = sock.recv(1024)
-            if not data:
-                break
-            sock.sendall(data)
-    finally:
-        sock.close()
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
 
-def main():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('0.0.0.0', 8080))
-    sock.listen(128)
+#define PORT 8080
+#define BUFFER_SIZE 1024
+
+int main() {
+    printf("=== Multi-Process Socket Server ===\n\n");
     
-    while True:
-        client, addr = sock.accept()
-        pid = os.fork()
-        if pid == 0:
-            # 子行程
-            sock.close()
-            handle_client(client, addr)
-            os._exit(0)
-        else:
-            # 父行程
-            client.close()
+    printf("Algorithm:\n");
+    printf("  1. Parent creates listening socket\n");
+    printf("  2. For each client: fork() a child process\n");
+    printf("  3. Child handles client, parent continues listening\n\n");
+    
+    printf("Code structure:\n");
+    printf("  int server_fd = socket(AF_INET, SOCK_STREAM, 0);\n");
+    printf("  bind(server_fd, ...);\n");
+    printf("  listen(server_fd, 128);\n\n");
+    
+    printf("  while (1) {\n");
+    printf("      int client = accept(server_fd, ...);\n");
+    printf("      pid_t pid = fork();\n");
+    printf("      if (pid == 0) {\n");
+    printf("          close(server_fd);\n");
+    printf("          handle_client(client);\n");
+    printf("          exit(0);\n");
+    printf("      } else {\n");
+    printf("          close(client);\n");
+    printf("      }\n");
+    printf("  }\n\n");
+    
+    printf("Advantages: + Good isolation, uses multiple cores\n");
+    printf("Disadvantages: - Higher memory overhead\n");
+    
+    return 0;
+}
 ```
 
 **事件驅動模型**
 
 使用 I/O 多路復用（非阻塞 select/poll/epoll）處理多個連線：
 
-```python
-import select
-import socket
+[_code/11/11_05_epoll_server.c](_code/11/11_05_epoll_server.c)
 
-def main():
-    sock = socket.socket()
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('0.0.0.0', 8080))
-    sock.listen(128)
-    sock.setblocking(False)
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/select.h>
+
+int main() {
+    printf("=== Event-Driven Server ===\n\n");
     
-    epoll = select.epoll()
-    epoll.register(sock.fileno(), select.EPOLLIN)
+    printf("select() workflow:\n");
+    printf("  fd_set readfds;\n");
+    printf("  FD_ZERO(&readfds);\n");
+    printf("  FD_SET(server_fd, &readfds);\n\n");
     
-    connections = {}
+    printf("  while (1) {\n");
+    printf("      fd_set r = readfds;\n");
+    printf("      int n = select(max_fd+1, &r, NULL, NULL, NULL);\n");
+    printf("      \n");
+    printf("      if (FD_ISSET(server_fd, &r)) {\n");
+    printf("          // New connection\n");
+    printf("      }\n");
+    printf("      for each client {\n");
+    printf("          if (FD_ISSET(client, &r)) {\n");
+    printf("              // Read data\n");
+    printf("          }\n");
+    printf("      }\n");
+    printf("  }\n\n");
     
-    try:
-        while True:
-            events = epoll.poll()
-            for fd, event in events:
-                if fd == sock.fileno():
-                    # 新連線
-                    client, addr = sock.accept()
-                    client.setblocking(False)
-                    connections[client.fileno()] = (client, addr)
-                    epoll.register(client.fileno(), select.EPOLLIN)
-                elif event & select.EPOLLIN:
-                    # 可讀事件
-                    client, _ = connections[fd]
-                    data = client.recv(1024)
-                    if data:
-                        client.sendall(data)
-                    else:
-                        client.close()
-                        epoll.unregister(fd)
-                        del connections[fd]
-    finally:
-        epoll.close()
+    printf("I/O Multiplexing APIs:\n");
+    printf("  select()  - POSIX, n <= 1024\n");
+    printf("  poll()    - POSIX, unlimited\n");
+    printf("  epoll()   - Linux only\n");
+    printf("  kqueue()  - BSD/macOS\n\n");
+    
+    return 0;
+}
 ```
 
 ## 11.4 網路層級與路由
