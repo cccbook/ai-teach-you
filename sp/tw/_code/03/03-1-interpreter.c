@@ -10,7 +10,7 @@ typedef enum {
     TOKEN_NUM, TOKEN_IDENT, TOKEN_PLUS, TOKEN_MINUS, 
     TOKEN_MULT, TOKEN_DIV, TOKEN_ASSIGN, TOKEN_LPAREN, 
     TOKEN_RPAREN, TOKEN_SEMI, TOKEN_PRINT, TOKEN_LET,
-    TOKEN_IF, TOKEN_WHILE, TOKEN_EOF 
+    TOKEN_EOF 
 } TokenType;
 
 typedef struct {
@@ -28,17 +28,13 @@ typedef struct ASTNode {
 
 Token tokens[MAX_TOKENS];
 int token_pos = 0;
+
+// 變數儲存 - 獨立的變數表
+char var_names[MAX_VARS][32];
+int var_values[MAX_VARS];
 int var_count = 0;
-int variables[MAX_VARS];
 
 // ========== 詞法分析 ==========
-int is_keyword(const char* s) {
-    return strcmp(s, "print") == 0 || 
-           strcmp(s, "let") == 0 ||
-           strcmp(s, "if") == 0 ||
-           strcmp(s, "while") == 0;
-}
-
 void tokenize(const char* input) {
     int i = 0, t = 0;
     while (input[i]) {
@@ -52,12 +48,14 @@ void tokenize(const char* input) {
             int j = 0;
             while (isalnum(input[i]) || input[i] == '_') 
                 name[j++] = input[i++];
-            if (strcmp(name, "print") == 0) tokens[t++] = (Token){TOKEN_PRINT, 0, ""};
-            else if (strcmp(name, "let") == 0) tokens[t++] = (Token){TOKEN_LET, 0, ""};
-            else if (strcmp(name, "if") == 0) tokens[t++] = (Token){TOKEN_IF, 0, ""};
-            else if (strcmp(name, "while") == 0) tokens[t++] = (Token){TOKEN_WHILE, 0, ""};
-            else tokens[t++] = (Token){TOKEN_IDENT, 0, ""};
-            strcpy(tokens[t-1].name, name);
+            if (strcmp(name, "print") == 0) 
+                tokens[t++] = (Token){TOKEN_PRINT, 0, ""};
+            else if (strcmp(name, "let") == 0) 
+                tokens[t++] = (Token){TOKEN_LET, 0, ""};
+            else {
+                tokens[t++] = (Token){TOKEN_IDENT, 0, ""};
+                strcpy(tokens[t-1].name, name);
+            }
         } else {
             switch(input[i++]) {
                 case '+': tokens[t++] = (Token){TOKEN_PLUS, 0, ""}; break;
@@ -79,7 +77,7 @@ ASTNode* parse_expr();
 
 ASTNode* make_num(int v) {
     ASTNode* n = (ASTNode*)malloc(sizeof(ASTNode));
-    n->type = 'N'; n->value = v;
+    n->type = 'N'; n->value = v; n->name[0] = '\0';
     n->left = n->right = NULL;
     return n;
 }
@@ -94,7 +92,7 @@ ASTNode* make_var(const char* name) {
 
 ASTNode* make_binop(char op, ASTNode* l, ASTNode* r) {
     ASTNode* n = (ASTNode*)malloc(sizeof(ASTNode));
-    n->type = op; n->left = l; n->right = r;
+    n->type = op; n->left = l; n->right = r; n->name[0] = '\0';
     return n;
 }
 
@@ -133,22 +131,24 @@ ASTNode* parse_expr() {
 // ========== 執行 ==========
 int get_var(const char* name) {
     for (int i = 0; i < var_count; i++) {
-        if (strcmp(tokens[i].name, name) == 0) return variables[i];
+        if (strcmp(var_names[i], name) == 0) return var_values[i];
     }
     return 0;
 }
 
 void set_var(const char* name, int value) {
     for (int i = 0; i < var_count; i++) {
-        if (strcmp(tokens[i].name, name) == 0) { 
-            variables[i] = value; return; 
+        if (strcmp(var_names[i], name) == 0) { 
+            var_values[i] = value; 
+            return; 
         }
     }
-    strcpy(tokens[var_count].name, name);
-    variables[var_count++] = value;
+    strcpy(var_names[var_count], name);
+    var_values[var_count++] = value;
 }
 
 int eval_expr(ASTNode* n) {
+    if (!n) return 0;
     if (n->type == 'N') return n->value;
     if (n->type == 'V') return get_var(n->name);
     int l = eval_expr(n->left), r = eval_expr(n->right);
@@ -161,40 +161,62 @@ int eval_expr(ASTNode* n) {
     return 0;
 }
 
+void free_ast(ASTNode* n) {
+    if (!n) return;
+    free_ast(n->left);
+    free_ast(n->right);
+    free(n);
+}
+
 void run(const char* input) {
     printf(">>> %s\n", input);
     tokenize(input);
     token_pos = 0;
     
     while (tokens[token_pos].type != TOKEN_EOF) {
-        Token t = tokens[token_pos++];
+        Token t = tokens[token_pos];
+        
         if (t.type == TOKEN_LET) {
+            token_pos++; // skip 'let'
             char name[32];
-            strcpy(name, tokens[token_pos++].name);
+            strcpy(name, tokens[token_pos].name);
+            token_pos++; // skip IDENT
             token_pos++; // skip '='
             ASTNode* e = parse_expr();
-            set_var(name, eval_expr(e));
+            int val = eval_expr(e);
+            set_var(name, val);
+            free_ast(e);
             token_pos++; // skip ';'
-        } else if (t.type == TOKEN_PRINT) {
+        } 
+        else if (t.type == TOKEN_PRINT) {
+            token_pos++; // skip 'print'
             token_pos++; // skip '('
             ASTNode* e = parse_expr();
-            printf("%d\n", eval_expr(e));
+            int val = eval_expr(e);
+            printf("%d\n", val);
+            free_ast(e);
             token_pos++; // skip ')'
             token_pos++; // skip ';'
-        } else if (t.type == TOKEN_IDENT) {
+        }
+        else if (t.type == TOKEN_IDENT) {
+            char name[32];
+            strcpy(name, t.name);
+            token_pos++; // skip IDENT
             token_pos++; // skip '='
             ASTNode* e = parse_expr();
-            set_var(t.name, eval_expr(e));
+            int val = eval_expr(e);
+            set_var(name, val);
+            free_ast(e);
             token_pos++; // skip ';'
         }
+        else {
+            // 可能是沒有分號的表達式
+            ASTNode* e = parse_expr();
+            if (e) printf("%d\n", eval_expr(e));
+            free_ast(e);
+            break;
+        }
     }
-}
-
-void free_ast(ASTNode* n) {
-    if (!n) return;
-    free_ast(n->left);
-    free_ast(n->right);
-    free(n);
 }
 
 int main() {
