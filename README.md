@@ -6,7 +6,7 @@
 
 > CoAuthor: [陳鍾誠](https://csie.nqu.edu.tw/p/404-1038-2377.php) ([ccckmit](https://github.com/ccckmit)) at [金門大學 (National Quemoy University)](https://www.nqu.edu.tw/)
 
-## AI Books
+## International Multilingual (12 Languages)
 
 | Link | Title | Skill | Available Language |
 |----------|-------|--------------------|--------------|
