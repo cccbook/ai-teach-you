@@ -6,6 +6,7 @@
 | [se](se/README.md) | 軟體工程 | Python | [繁體](se/tw/README.md) |
 | [wp](wp/README.md) | 網站設計 | HTML+CSS<br/>JavaScript+React<br/>Python+FastAPI | [繁體](wp/tw/README.md) |
 | [sp](sp/README.md) | 系統程式 | Python/C | [繁體](sp/tw/README.md) |
+| [compiler](compiler/README.md) | 編譯器 | Python/C | [繁體](compiler/tw/README.md) |
 | [ai](ai/README.md) | 機器學習 | Python | [繁體](ai/tw/README.md) |
 | [alg](alg/README.md) | 演算法 | Python | Waiting ... |
 | [co](co/README.md) | 計算機結構 | Verilog | Waiting ... |
